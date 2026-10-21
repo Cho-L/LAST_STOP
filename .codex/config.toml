@@ -1,0 +1,23 @@
+# Project-scoped Codex config; requires project trust and supported Codex CLI version.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+[features]
+multi_agent = true
+[agents]
+max_threads = 5
+max_depth = 1
+[agents.planning]
+description = "LAST STOP gameplay design and balance specialist"
+config_file = "agents/planning.toml"
+[agents.art]
+description = "LAST STOP pixel art asset specification specialist"
+config_file = "agents/art.toml"
+[agents.development]
+description = "LAST STOP Unity 6 C# gameplay developer"
+config_file = "agents/development.toml"
+[agents.ui]
+description = "LAST STOP HUD and UX specialist"
+config_file = "agents/ui.toml"
+[agents.sound]
+description = "LAST STOP game audio design specialist"
+config_file = "agents/sound.toml"
