@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: fbc6f5cfcd6353741a99e33d08697c81
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6837309966902168667
+    second: LastStop_InteriorCore_v1_0
+  - first:
+      213: 3755137322057371758
+    second: LastStop_InteriorCore_v1_1
+  - first:
+      213: 6440805132135008982
+    second: LastStop_InteriorCore_v1_2
+  - first:
+      213: -7382000368369030791
+    second: LastStop_InteriorCore_v1_3
+  - first:
+      213: -6133178452428824194
+    second: LastStop_InteriorCore_v1_4
+  - first:
+      213: 6572010298460121014
+    second: LastStop_InteriorCore_v1_5
+  - first:
+      213: -1860117347517312966
+    second: LastStop_InteriorCore_v1_6
+  - first:
+      213: 3092650779122952644
+    second: LastStop_InteriorCore_v1_7
+  - first:
+      213: 338788128206240845
+    second: LastStop_InteriorCore_v1_8
+  - first:
+      213: -3082966935131457083
+    second: LastStop_InteriorCore_v1_9
+  - first:
+      213: 2596163842988455264
+    second: LastStop_InteriorCore_v1_10
+  - first:
+      213: -62786952122879935
+    second: LastStop_InteriorCore_v1_11
+  - first:
+      213: 8781288689991835539
+    second: LastStop_InteriorCore_v1_12
+  - first:
+      213: 5889029549241426704
+    second: LastStop_InteriorCore_v1_13
+  - first:
+      213: 5500598717324100594
+    second: LastStop_InteriorCore_v1_14
+  - first:
+      213: 4190613155988533107
+    second: LastStop_InteriorCore_v1_15
+  - first:
+      213: -7415452397457928780
+    second: LastStop_InteriorCore_v1_16
+  - first:
+      213: 4581933007239974834
+    second: LastStop_InteriorCore_v1_17
+  - first:
+      213: 7485026253883524525
+    second: LastStop_InteriorCore_v1_18
+  - first:
+      213: -8700260126276232169
+    second: LastStop_InteriorCore_v1_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_0
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 25
+        width: 1185
+        height: 1207
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a3fe8b8fcefc11a0800000000000000
+      internalID: -6837309966902168667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_1
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 965
+        width: 11
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e609a04bf7dec1430800000000000000
+      internalID: 3755137322057371758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_2
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 915
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6da8b609426526950800000000000000
+      internalID: 6440805132135008982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_3
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 923
+        width: 13
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 979af87c6cddd8990800000000000000
+      internalID: -7382000368369030791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_4
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 580
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7166e641b292eaa0800000000000000
+      internalID: -6133178452428824194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_5
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 549
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b7ace3eb88743b50800000000000000
+      internalID: 6572010298460121014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_6
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 552
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3050b4b0298f26e0800000000000000
+      internalID: -1860117347517312966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_7
+      rect:
+        serializedVersion: 2
+        x: 1076
+        y: 401
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c965ff7f7d4bea20800000000000000
+      internalID: 3092650779122952644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_8
+      rect:
+        serializedVersion: 2
+        x: 1059
+        y: 327
+        width: 9
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4c3ad3f10e93b400800000000000000
+      internalID: 338788128206240845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_9
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 272
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c9f63128e91735d0800000000000000
+      internalID: -3082966935131457083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_10
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 278
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0653a08924d670420800000000000000
+      internalID: 2596163842988455264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_11
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 242
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 140bf26899fe02ff0800000000000000
+      internalID: -62786952122879935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_12
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 114
+        width: 15
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39f5e1dc9876dd970800000000000000
+      internalID: 8781288689991835539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_13
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 103
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01360527c290ab150800000000000000
+      internalID: 5889029549241426704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_14
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 47
+        width: 21
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f38216d36d065c40800000000000000
+      internalID: 5500598717324100594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_15
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 71
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37f66c9667c082a30800000000000000
+      internalID: 4190613155988533107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_16
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 63
+        width: 9
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4bd83b05555071990800000000000000
+      internalID: -7415452397457928780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_17
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 69
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bf0d214bcb469f30800000000000000
+      internalID: 4581933007239974834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_18
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 57
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da5433578b720e760800000000000000
+      internalID: 7485026253883524525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: LastStop_InteriorCore_v1_19
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 55
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71c5fc7d287724780800000000000000
+      internalID: -8700260126276232169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      LastStop_InteriorCore_v1_0: -6837309966902168667
+      LastStop_InteriorCore_v1_1: 3755137322057371758
+      LastStop_InteriorCore_v1_10: 2596163842988455264
+      LastStop_InteriorCore_v1_11: -62786952122879935
+      LastStop_InteriorCore_v1_12: 8781288689991835539
+      LastStop_InteriorCore_v1_13: 5889029549241426704
+      LastStop_InteriorCore_v1_14: 5500598717324100594
+      LastStop_InteriorCore_v1_15: 4190613155988533107
+      LastStop_InteriorCore_v1_16: -7415452397457928780
+      LastStop_InteriorCore_v1_17: 4581933007239974834
+      LastStop_InteriorCore_v1_18: 7485026253883524525
+      LastStop_InteriorCore_v1_19: -8700260126276232169
+      LastStop_InteriorCore_v1_2: 6440805132135008982
+      LastStop_InteriorCore_v1_3: -7382000368369030791
+      LastStop_InteriorCore_v1_4: -6133178452428824194
+      LastStop_InteriorCore_v1_5: 6572010298460121014
+      LastStop_InteriorCore_v1_6: -1860117347517312966
+      LastStop_InteriorCore_v1_7: 3092650779122952644
+      LastStop_InteriorCore_v1_8: 338788128206240845
+      LastStop_InteriorCore_v1_9: -3082966935131457083
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

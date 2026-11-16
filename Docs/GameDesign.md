@@ -1,8 +1,10 @@
 # LAST STOP — MVP design baseline
 Genre: 2D bus survival roguelike, Unity 6, C#.
-EXTERIOR: top-down view; player survives waves using automatic attacks. Bus remains a central gameplay object.
+EXTERIOR: top-down view; the moving bus fires its weapons automatically at approaching enemies. The character fights only inside the bus. The exterior simulation continues while the interior is shown.
 INTERIOR: side-view manual combat; enemies breach bus while exterior simulation continues.
-Player can switch views; interior breach counter reaches warning threshold at 50; player must deal with threats and seal entry points; then return exterior.
-HP <= 0 triggers game over. Other defeat conditions, precise controls, progression, enemies, art direction and numerical balance are TBD and require director approval.
-First playable: one exterior arena, one bus interior, one enemy archetype, auto attack, manual interior attack, breach counter, scene/view switch, one seal interaction, health and game over, placeholder visuals/audio.
-Technical decision pending: single scene with dual camera/areas vs additive scenes. Development proposes before implementing.
+Each exterior enemy touching the bus enters the interior one-for-one. Player switches views to fight intruders, then returns outside while both simulations continue. There is no sealing mechanic. Interior enemy count 50 is a warning threshold, not an instant defeat.
+Player and visible interior core share one survival HP pool. An interior enemy moves toward the core; if it encounters the player, it attacks the player, otherwise it attacks the core on arrival. Each actual hit damages the shared HP once; enemy count alone causes no damage. Shared HP <= 0 triggers game over. Exact combat balance remains subject to director review.
+The player starts behind the core and can move forward to intercept approaching intruders. Exterior projectiles stop tracking an enemy once it enters the bus.
+Demo target: survive eight minutes to reach the next stop. The planned full release uses an endless run until defeat. The demo scope is three weapons and two support abilities; the full game targets at least seven weapon techs and combinations that can include five parts. Exact content, progression, and balance remain subject to director review.
+First playable: one exterior arena, one bus interior, one enemy archetype, bus auto attack, manual interior attack, 1:1 intrusion, view switch, shared survival HP, core target and game over, placeholder visuals/audio.
+A playable prototype exists. Its current scene structure, UI, audio, and art require integration review before being marked complete; see Docs/Tasks.md.

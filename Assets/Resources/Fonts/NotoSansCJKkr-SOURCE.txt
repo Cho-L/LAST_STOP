@@ -1,0 +1,8 @@
+Noto Sans CJK KR Regular
+Source: https://github.com/notofonts/noto-cjk/blob/main/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf
+Downloaded: 2026-11-08
+SHA-256: 6BCB2A0703AA137E874FC2DFFA85F6C21BA9A67FA329E81B8C801663AF7E992A
+License: SIL Open Font License 1.1 (see NotoSansCJKkr-LICENSE.txt)
+
+This is a readable fallback UI face for Korean and Latin text. The final pixel-style
+display typography remains an art/UI decision.

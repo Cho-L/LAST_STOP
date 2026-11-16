@@ -1,0 +1,403 @@
+fileFormatVersion: 2
+guid: b166b0d9239b1604f83a9ef89bcbbc41
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1472863285870446218
+    second: LastStop_CombatVfx_v1_0
+  - first:
+      213: -3345747634795852525
+    second: LastStop_CombatVfx_v1_1
+  - first:
+      213: 4824347594716753549
+    second: LastStop_CombatVfx_v1_2
+  - first:
+      213: -3289256778695571324
+    second: LastStop_CombatVfx_v1_3
+  - first:
+      213: 8011863250600136771
+    second: LastStop_CombatVfx_v1_4
+  - first:
+      213: -4659650992645844249
+    second: LastStop_CombatVfx_v1_5
+  - first:
+      213: 92083511170297500
+    second: LastStop_CombatVfx_v1_6
+  - first:
+      213: -324187195534878543
+    second: LastStop_CombatVfx_v1_7
+  - first:
+      213: -1318058328121641049
+    second: LastStop_CombatVfx_v1_8
+  - first:
+      213: -5177207030359782193
+    second: LastStop_CombatVfx_v1_9
+  - first:
+      213: 3978699901169671926
+    second: LastStop_CombatVfx_v1_10
+  - first:
+      213: 2393369582460553133
+    second: LastStop_CombatVfx_v1_11
+  - first:
+      213: 3707915318693129420
+    second: LastStop_CombatVfx_v1_12
+  - first:
+      213: -5899149524065809392
+    second: LastStop_CombatVfx_v1_13
+  - first:
+      213: 7238276637757015226
+    second: LastStop_CombatVfx_v1_14
+  - first:
+      213: -859462869883340656
+    second: LastStop_CombatVfx_v1_15
+  - first:
+      213: 6562098960422433814
+    second: LastStop_CombatVfx_v1_16
+  - first:
+      213: -2066212970162175220
+    second: LastStop_CombatVfx_v1_17
+  - first:
+      213: -7535484821445000017
+    second: LastStop_CombatVfx_v1_18
+  - first:
+      213: -8610781787344925294
+    second: LastStop_CombatVfx_v1_19
+  - first:
+      213: -8561490713941872598
+    second: LastStop_CombatVfx_v1_20
+  - first:
+      213: -7328939762748919662
+    second: LastStop_CombatVfx_v1_21
+  - first:
+      213: 4548113563194498972
+    second: LastStop_CombatVfx_v1_22
+  - first:
+      213: -6088361861741927061
+    second: LastStop_CombatVfx_v1_23
+  - first:
+      213: 7089803793070747692
+    second: LastStop_CombatVfx_v1_24
+  - first:
+      213: 840304627645009383
+    second: LastStop_CombatVfx_v1_25
+  - first:
+      213: 8853242456546226022
+    second: LastStop_CombatVfx_v1_26
+  - first:
+      213: 3670311673466267138
+    second: LastStop_CombatVfx_v1_27
+  - first:
+      213: 3486813200876543123
+    second: LastStop_CombatVfx_v1_28
+  - first:
+      213: 1336116710030051495
+    second: LastStop_CombatVfx_v1_29
+  - first:
+      213: -1938657824449801939
+    second: LastStop_CombatVfx_v1_30
+  - first:
+      213: 7409427646967015527
+    second: LastStop_CombatVfx_v1_31
+  - first:
+      213: 8304825192656100984
+    second: LastStop_CombatVfx_v1_32
+  - first:
+      213: -2661982959318023004
+    second: LastStop_CombatVfx_v1_33
+  - first:
+      213: 975568514351858071
+    second: LastStop_CombatVfx_v1_34
+  - first:
+      213: 7214257080020380750
+    second: LastStop_CombatVfx_v1_35
+  - first:
+      213: -7169035025004233378
+    second: LastStop_CombatVfx_v1_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Vfx_Bean_Projectile
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 663
+        width: 192
+        height: 77
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87e7f82f223747e42a11dc355ad3f035
+      internalID: 404501685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vfx_Bubble_Projectile
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 653
+        width: 185
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aad71d7ba57bb924bb9097c091baee80
+      internalID: 473406302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vfx_Flame_Loop
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 378
+        width: 430
+        height: 161
+      alignment: 9
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd4da1ff11deab747b023ce56167770d
+      internalID: -375946465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vfx_Hit
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 384
+        width: 135
+        height: 142
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d897b17c561cae4898f06b5652fea2c
+      internalID: -2135942815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vfx_Enemy_Death
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 384
+        width: 161
+        height: 141
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3ac76e7d6a67ee4190238012fda6277
+      internalID: 1532742147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vfx_Seal_Complete
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 79
+        width: 233
+        height: 232
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 927e42b9c45538d48ad7e18172ff2d8c
+      internalID: 1554302190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 1331b763507022e4c95e3d50e1412012
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      LastStop_CombatVfx_v1_0: 1472863285870446218
+      LastStop_CombatVfx_v1_1: -3345747634795852525
+      LastStop_CombatVfx_v1_10: 3978699901169671926
+      LastStop_CombatVfx_v1_11: 2393369582460553133
+      LastStop_CombatVfx_v1_12: 3707915318693129420
+      LastStop_CombatVfx_v1_13: -5899149524065809392
+      LastStop_CombatVfx_v1_14: 7238276637757015226
+      LastStop_CombatVfx_v1_15: -859462869883340656
+      LastStop_CombatVfx_v1_16: 6562098960422433814
+      LastStop_CombatVfx_v1_17: -2066212970162175220
+      LastStop_CombatVfx_v1_18: -7535484821445000017
+      LastStop_CombatVfx_v1_19: -8610781787344925294
+      LastStop_CombatVfx_v1_2: 4824347594716753549
+      LastStop_CombatVfx_v1_20: -8561490713941872598
+      LastStop_CombatVfx_v1_21: -7328939762748919662
+      LastStop_CombatVfx_v1_22: 4548113563194498972
+      LastStop_CombatVfx_v1_23: -6088361861741927061
+      LastStop_CombatVfx_v1_24: 7089803793070747692
+      LastStop_CombatVfx_v1_25: 840304627645009383
+      LastStop_CombatVfx_v1_26: 8853242456546226022
+      LastStop_CombatVfx_v1_27: 3670311673466267138
+      LastStop_CombatVfx_v1_28: 3486813200876543123
+      LastStop_CombatVfx_v1_29: 1336116710030051495
+      LastStop_CombatVfx_v1_3: -3289256778695571324
+      LastStop_CombatVfx_v1_30: -1938657824449801939
+      LastStop_CombatVfx_v1_31: 7409427646967015527
+      LastStop_CombatVfx_v1_32: 8304825192656100984
+      LastStop_CombatVfx_v1_33: -2661982959318023004
+      LastStop_CombatVfx_v1_34: 975568514351858071
+      LastStop_CombatVfx_v1_35: 7214257080020380750
+      LastStop_CombatVfx_v1_36: -7169035025004233378
+      LastStop_CombatVfx_v1_4: 8011863250600136771
+      LastStop_CombatVfx_v1_5: -4659650992645844249
+      LastStop_CombatVfx_v1_6: 92083511170297500
+      LastStop_CombatVfx_v1_7: -324187195534878543
+      LastStop_CombatVfx_v1_8: -1318058328121641049
+      LastStop_CombatVfx_v1_9: -5177207030359782193
+      Vfx_Bean_Projectile: 404501685
+      Vfx_Bubble_Projectile: 473406302
+      Vfx_Enemy_Death: 1532742147
+      Vfx_Flame_Loop: -375946465
+      Vfx_Hit: -2135942815
+      Vfx_Seal_Complete: 1554302190
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
