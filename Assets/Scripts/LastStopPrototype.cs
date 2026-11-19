@@ -1,12 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace LastStop
 {
     internal static class LastStopBootstrap
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void Initialize()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            CreatePrototype();
+        }
+
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mode == LoadSceneMode.Single) CreatePrototype();
+        }
+
         private static void CreatePrototype()
         {
             if (Object.FindFirstObjectByType<LastStopPrototype>() != null)
@@ -109,7 +122,8 @@ namespace LastStop
         private UnityEngine.UI.Text objectiveLabel;
         private UnityEngine.UI.Text loadoutLabel;
         private UnityEngine.UI.Text hintToastLabel;
-        private UnityEngine.UI.Text gameOverLabel;
+        private UnityEngine.UI.Text resultTitle;
+        private UnityEngine.UI.Text resultDetails;
         private UnityEngine.UI.Image statusPanel;
         private UnityEngine.UI.Image loadoutPanel;
         private UnityEngine.UI.Image actionPanel;
@@ -209,6 +223,7 @@ namespace LastStop
                 return;
             }
 
+            TryOfferLevelUp();
             RefreshHud();
         }
 
@@ -497,9 +512,15 @@ namespace LastStop
             SetAnchors(resultDim.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             resultDim.gameObject.SetActive(false);
             resultPanel = CreateUiPanel(canvasObject.transform, "Result Panel", new Color(0.035f, 0.06f, 0.13f, 0.96f));
-            SetAnchors(resultPanel.rectTransform, new Vector2(0.2f, 0.31f), new Vector2(0.8f, 0.69f), Vector2.zero, Vector2.zero);
-            gameOverLabel = CreateUiText(resultPanel.transform, "Result Text", TextAnchor.MiddleCenter, 44);
-            SetAnchors(gameOverLabel.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 20f), new Vector2(-28f, -20f));
+            SetAnchors(resultPanel.rectTransform, new Vector2(0.17f, 0.27f), new Vector2(0.83f, 0.73f), Vector2.zero, Vector2.zero);
+            resultTitle = CreateUiText(resultPanel.transform, "Result Title", TextAnchor.MiddleCenter, 36);
+            SetAnchors(resultTitle.rectTransform, new Vector2(0.07f, 0.73f), new Vector2(0.93f, 0.94f), Vector2.zero, Vector2.zero);
+            resultDetails = CreateUiText(resultPanel.transform, "Result Details", TextAnchor.MiddleCenter, 26);
+            SetAnchors(resultDetails.rectTransform, new Vector2(0.07f, 0.31f), new Vector2(0.93f, 0.71f), Vector2.zero, Vector2.zero);
+            var restartHint = CreateUiText(resultPanel.transform, "Restart Hint", TextAnchor.MiddleCenter, 24);
+            restartHint.text = "[R] 다시 출발";
+            restartHint.color = new Color(0.77f, 0.87f, 0.96f);
+            SetAnchors(restartHint.rectTransform, new Vector2(0.07f, 0.08f), new Vector2(0.93f, 0.26f), Vector2.zero, Vector2.zero);
             resultPanel.gameObject.SetActive(false);
 
             levelUpDim = CreateUiPanel(canvasObject.transform, "Level Up Dim", new Color(0.01f, 0.02f, 0.05f, 0.72f));
@@ -885,6 +906,8 @@ namespace LastStop
             }
 
             interiorAttackTimer += Time.deltaTime;
+            if (flameSkewerUnlocked)
+                flameAttackTimer = Mathf.Min(0.7f, flameAttackTimer + Time.deltaTime);
             if (Keyboard.current != null && Keyboard.current.spaceKey.isPressed && interiorAttackTimer >= InteriorAttackInterval)
             {
                 interiorAttackTimer = 0f;
@@ -986,8 +1009,16 @@ namespace LastStop
 
             var muzzlePosition = exteriorBus.localPosition + new Vector3(0.4f, 0.7f, 0f);
             if (artSprites.ContainsKey("Vfx_Bus_Muzzle"))
-                SpawnFeedback(exteriorRoot, muzzlePosition,
-                    new Vector2(0.62f, 0.72f), Color.white, 0.11f, "Vfx_Bus_Muzzle");
+            {
+                var targetPosition = exteriorRoot.InverseTransformPoint(target.Transform.position);
+                var direction = ((Vector2)(targetPosition - muzzlePosition)).normalized;
+                var flashPosition = (Vector2)muzzlePosition + direction * 0.16f;
+                var flash = CreateBlock("콩알포 포구 섬광", exteriorRoot, flashPosition,
+                    new Vector2(0.74f, 0.39f), Color.white, 6, "Vfx_Bus_Muzzle");
+                var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                flash.localRotation = Quaternion.Euler(0f, 0f, angle);
+                DestroyPresentation(flash.gameObject, 0.075f);
+            }
             var projectile = CreateBlock("콩알 탄환", exteriorRoot, muzzlePosition, new Vector2(0.48f, 0.18f), Color.white, 4, "Vfx_Bean_Projectile");
             projectile.gameObject.AddComponent<LastStopProjectileVisual>().Configure(
                 target.Transform,
@@ -1046,8 +1077,7 @@ namespace LastStop
 
         private void TryFlameSkewer(List<Enemy> targets, Transform effectRoot)
         {
-            if (!flameSkewerUnlocked) return;
-            flameAttackTimer += Time.deltaTime;
+            if (!flameSkewerUnlocked || levelUpOpen || gameOver) return;
             if (flameAttackTimer < 0.7f) return;
             flameAttackTimer = 0f;
 
@@ -1200,7 +1230,7 @@ namespace LastStop
 
         private void DamageEnemy(Enemy enemy, float damage)
         {
-            if (enemy == null || enemy.IsDefeated || enemy.Transform == null) return;
+            if (gameOver || levelUpOpen || enemy == null || enemy.IsDefeated || enemy.Transform == null) return;
             enemy.Health -= damage;
             if (enemy.IsInside)
                 SpawnInteriorHitFeedback(enemy, enemy.Health > 0f);
@@ -1305,7 +1335,6 @@ namespace LastStop
         {
             if (gameOver) return;
             runState.Experience += amount;
-            TryOfferLevelUp();
         }
 
         private bool TryOfferLevelUp()
@@ -1333,9 +1362,9 @@ namespace LastStop
             levelUpChoiceLabels[0].text = bubbleLauncherUnlocked && !exteriorPiercingUnlocked ? "관통 탄환" : "콩알 연발포";
             levelUpChoiceDetails[0].text = bubbleLauncherUnlocked && !exteriorPiercingUnlocked ? "느려진 적 명중 시\n팝콘 분열탄" : "외부 자동 공격력 +1";
             levelUpChoiceLabels[1].text = flameSkewerUnlocked ? $"꼬치 화염 강화 {flameSkewerLevel + 1}" : bubbleLauncherUnlocked ? "꼬치 화염기" : "말랑 비눗방울";
-            levelUpChoiceDetails[1].text = flameSkewerUnlocked ? "화염 피해 +1" : bubbleLauncherUnlocked ? "근거리 다수 적 정리" : "주변 적 감속";
+            levelUpChoiceDetails[1].text = flameSkewerUnlocked ? "화염 피해 +1" : bubbleLauncherUnlocked ? "외부 단일 화염\n내부 공격에 범위 화염" : "적 한 마리 타격·감속";
             levelUpChoiceLabels[2].text = "차체 보강";
-            levelUpChoiceDetails[2].text = "공용 생존력 최대치 +25";
+            levelUpChoiceDetails[2].text = "최대·현재 생존력 +25";
             levelUpDim.gameObject.SetActive(true);
             levelUpPanel.gameObject.SetActive(true);
             RefreshHud();
@@ -1483,7 +1512,7 @@ namespace LastStop
             levelUpDim.gameObject.SetActive(false);
             Time.timeScale = 0f;
             LastStopAudio.TryPlay(LastStopAudioEvent.GameOver);
-            ShowResult("이번 정류장은 여기까지…\n" + reason + "\n[R] 다시 출발", new Color(1f, 0.34f, 0.25f));
+            ShowResult("이번 정류장은 여기까지…", reason, new Color(1f, 0.34f, 0.25f));
         }
 
         private void EndArrival()
@@ -1495,17 +1524,20 @@ namespace LastStop
             levelUpPanel.gameObject.SetActive(false);
             levelUpDim.gameObject.SetActive(false);
             Time.timeScale = 0f;
-            ShowResult($"다음 정류장 도착!\n버스를 지켜냈어요\n생존 시간 08:00 · 처치 {kills} · 최고 차내 {peakBreaches}\n레벨 {runState.Level}\n[R] 다시 출발", new Color(0.43f, 0.95f, 0.78f));
+            ShowResult("다음 정류장 도착!",
+                $"버스를 지켜냈어요\n생존 시간 08:00 · 처치 {kills}\n최고 차내 {peakBreaches} · 레벨 {runState.Level}",
+                new Color(0.43f, 0.95f, 0.78f));
         }
 
-        private void ShowResult(string message, Color textColor)
+        private void ShowResult(string title, string details, Color titleColor)
         {
             if (hintToastPanel != null) hintToastPanel.gameObject.SetActive(false);
             SetHudVisible(false);
             resultDim.gameObject.SetActive(true);
             resultPanel.gameObject.SetActive(true);
-            gameOverLabel.color = textColor;
-            gameOverLabel.text = message;
+            resultTitle.color = titleColor;
+            resultTitle.text = title;
+            resultDetails.text = details;
         }
 
         private void SetHudVisible(bool visible)
@@ -1594,7 +1626,7 @@ namespace LastStop
         private void Restart()
         {
             Time.timeScale = 1f;
-            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         [System.Diagnostics.Conditional("UNITY_EDITOR")]

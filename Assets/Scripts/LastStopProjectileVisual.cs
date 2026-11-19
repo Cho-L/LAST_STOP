@@ -33,6 +33,8 @@ namespace LastStop
                 return;
             }
 
+            if (Time.deltaTime <= 0f) return;
+
             if (faceTarget) UpdateFacing();
             transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
             if (Vector2.Distance(transform.position, target.position) > 0.08f) return;

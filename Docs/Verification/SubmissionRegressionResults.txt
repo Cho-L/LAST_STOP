@@ -1,0 +1,25 @@
+PASS interior flame fired >=3 times at 30 FPS
+PASS flame interval 0.800s at 30 FPS
+PASS flame interval 0.800s at 30 FPS
+PASS flame interval 0.800s at 30 FPS
+PASS interior flame fired >=3 times at 60 FPS
+PASS flame interval 0.733s at 60 FPS
+PASS flame interval 0.733s at 60 FPS
+PASS flame interval 0.733s at 60 FPS
+PASS flame interval 0.733s at 60 FPS
+PASS interior flame fired >=3 times at 120 FPS
+PASS flame interval 0.733s at 120 FPS
+PASS flame interval 0.733s at 120 FPS
+PASS flame interval 0.733s at 120 FPS
+PASS flame interval 0.733s at 120 FPS
+PASS paused deltaTime is zero
+PASS paused overlapping projectile causes no damage
+PASS level-up blocks enemy damage
+PASS result blocks enemy damage
+PASS contact transfers exactly one live enemy
+PASS entry preserves shared HP and enemy health
+PASS XP gain does not open modal during attack
+PASS frame-end offer pauses game
+PASS choice resumes game
+PASS 50 interior enemies warn without automatic damage or defeat
+PASS actual core hit ends run at HP zero
