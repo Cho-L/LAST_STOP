@@ -1,298 +1,550 @@
-# LAST STOP — Sprint 1 아트 사양서
+# LAST STOP — Sprint 1 아트 사양서 (탑다운 / 고해상도 픽셀아트 개정판)
 
-작성: Art 팀 (텍스트 전용 에이전트, 2026-11-27)
-상태: 제안 / 디렉터 검토 대기. 이 문서는 사양과 생성 프롬프트이며, 실제 이미지 파일은 만들지 않았다. 아래 "신규 에셋"은 모두 아직 존재하지 않는다.
+작성: Art 팀 (텍스트 전용 에이전트), 개정 2026-11-27
+상태: **제안 / 디렉터 검토 대기.** 이 문서는 사양과 생성 프롬프트만 담는다. 실제 이미지는 만들지 않았다. "신규 에셋"으로 적은 파일은 모두 아직 없다.
 
-참조: `AGENTS.md`, `Docs/GameDesign.md`, `Docs/Tasks.md`(BLOCKED 루프 무기 4방향, REVIEW 내부 스프라이트 크기/프레임 애니메이션 부재), `Docs/Teams/Art.md`, `Assets/Scripts/LastStopPrototype.cs`, `Assets/Scripts/LastStopSpriteMotion.cs`, `Docs/Media/last-stop-preview.gif`.
+참조: `AGENTS.md`, `Docs/GameDesign.md`("Director decisions (2026-11-27)"), `Docs/Tasks.md`, `Docs/Teams/Art.md`, `Docs/Media/StyleReference/A_HD_PixelArt_Interior_Mockup.webp`(승인된 스타일 기준), `B_HD_Illustration_Interior_Mockup_rejected.webp`(거절안, 대비용), `Assets/Scripts/LastStopPrototype.cs`, `Assets/Scripts/LastStopBusWheelAnimation.cs`, `Packages/manifest.json`.
 
----
+### 이번 개정에서 바뀐 것
 
-## 0. 기준 수치 (코드에서 측정)
-
-| 항목 | 값 | 출처 |
+| 이전 판 | 이번 판 | 근거 |
 |---|---|---|
-| 카메라 | 외부/내부 모두 Orthographic, size 5.5 → 화면 세로 11 world unit | `ConfigureCamera` |
-| 960x540에서 1 world unit | 540 / 11 = **49.09 화면 px** (정수 아님) | 계산 |
-| 스프라이트 크기 결정 방식 | `CreateBlock`이 원본 크기와 무관하게 지정한 world 크기로 **비균등 스케일** (`size.x / spriteSize.x`, `size.y / spriteSize.y`) | `CreateBlock`, `ConfigureSprite` |
-| 로드 경로 | `Resources.LoadAll<Sprite>("Art/...")` → 실제 파일은 `Assets/Resources/Art/` (`Assets/Art/`는 현재 `.gitkeep`만 있음) | `LoadArtSprites` |
-| 런타임 필터 | 배경과 스윙 시트는 코드에서 `FilterMode.Point`로 강제 | `LoadBackdropSprite`, `ConfigureInteriorSwing` |
-| 플레이어 공격 | 입력 간격 0.18초, 포즈 표시 0.16초 (0–0.055초 contact, 이후 follow-through), 타격 판정은 **입력 즉시** | `InteriorAttackInterval`, `LastStopSpriteMotion` |
-| 내부 적 공격 | 0.8초 간격, 1회 7 HP | `DamageTimer < 0.8f`, Tasks.md |
-| 포구 위치 | 방향과 무관하게 버스 중심 + (0.4, 0.7) 고정 | `FireBusProjectile` |
+| 내부 = 측면 시점, 캐릭터 약 48 아트 px | 내부와 외부 모두 **3/4 탑다운**(Vampire Survivors류, 캐릭터는 정면 쪽으로 약간 기울여 보임) | 디렉터 결정: 카메라 |
+| 저해상도 픽셀아트, 가상 480x270, PPU 24 | **고해상도 픽셀아트**, 캐릭터 64–96 아트 px, 가상 **960x540**, PPU **48** 제안 | 디렉터 결정: 아트 스타일 A |
+| 측면 플레이어/Rusher/코어 시트, 4방향 측면 지붕포 | 탑다운 방향별 시트, 내부 타일·소품, 탑다운 외부 버스, 8방향 지붕 무기 | 위와 같음 |
+| 측면 프롬프트 | 목업 기반 공통 스타일 블록 + 에셋별 프롬프트 | 위와 같음 |
+
+유지한 것: 현재 에셋 인벤토리, 코드 경로 사실(내부 적 스프라이트 복사 `LastStopPrototype.cs:807`, 없는 `BusBody_v2`/`BusWheels_v2` 등), 알파 이진화·크로마·팔레트 매핑 후처리 원칙, 봉인 모티프 금지.
+
+**레이아웃 의존 표시:** Planning의 탑다운 내부 사양(레이아웃, 조작, 적 경로, 카메라)이 아직 없다(Tasks.md TODO). 내부 배치에 따라 바뀌는 항목에는 **[잠정]**을 붙였다. 목업의 배치(가운데 코어, 한쪽 끝 문, 반대쪽 끝 운전석, 양쪽 벽 좌석)는 출발점일 뿐 승인된 배치가 아니다.
 
 ---
 
-## 1. 현재 에셋 인벤토리
+## 0. 기준 수치 (코드에서 확인)
 
-모든 PNG는 `Assets/Resources/Art/`에 있다. "화면 크기"는 960x540 Game view 기준 계산값이며 `Docs/Media/last-stop-preview.gif` 프레임으로 육안 확인했다.
+| 항목 | 현재 값 | 출처 |
+|---|---|---|
+| 카메라 | 외부/내부 모두 Orthographic size **5.5** → 화면 세로 11 wu | `ConfigureCamera` (`LastStopPrototype.cs:251`) |
+| 렌더 파이프라인 | URP `17.3.0`. `com.unity.2d.aseprite 3.0.1`, `2d.tilemap`, `2d.tilemap.extras`, `2d.animation` 설치됨 | `Packages/manifest.json` |
+| 스프라이트 크기 결정 | `CreateBlock`이 원본 크기와 무관하게 지정 world 크기로 **비균등 스케일**. 예: 버스 4.8x1.8 wu(`:344`), 코어 0.96x1.05 wu(`:443`) | `CreateBlock`, `ConfigureSprite` |
+| 로드 경로 | `Resources.LoadAll<Sprite>("Art/...")` → 실제 파일은 `Assets/Resources/Art/`. `Assets/Art/`는 비어 있음 | `LoadArtSprites` (`:280-284`) |
+| 런타임 필터 | 배경과 스윙 시트는 코드에서 `FilterMode.Point`로 강제 | `LoadBackdropSprite`, `ConfigureInteriorSwing` (`:948`) |
+| 내부 적 스프라이트 | 실제 침입 경로 `TransferEnemyInside`(`:767`) → `SeparateInteriorEnemyVisual`(`:792`)이 **외부 적 스프라이트를 그대로 복사**(`:807` `visualRenderer.sprite = originalRenderer.sprite`). `Enemy_Interior_SideView`는 쓰이지 않는다. `SpawnInteriorEnemy`(`:1125`)는 호출처가 없다 | 코드 |
+| 버스 바퀴 애니 계약 | `Bus_Body_NoWheels` 1장 + `Bus_Wheels_0..3` 4장. **네 장 모두 body와 rect 크기, pivot, PPU가 같아야** 한다. 12 fps, 바퀴는 body보다 sortingOrder −1 | `TryGetAnimatedBusArt` (`:357`), `LastStopBusWheelAnimation.cs` |
+| 버스 포구 | 방향과 무관하게 버스 중심 + (0.4, 0.7) 고정 | `FireBusProjectile` (`:1010`) |
+| 플레이어 공격 | 입력 간격 0.18초, 포즈 0.16초, 타격 판정은 **입력 즉시**, 3타 콤보 강조 | `InteriorAttackInterval`, `LastStopSpriteMotion` |
+| 내부 적 공격 | 0.8초 간격, 1회 7 HP | Tasks.md 검증 기록 |
+| UI 기준 | CanvasScaler 1280x720, match 0.5 | `Docs/Sprint1/UI.md` |
 
-| 파일 | 픽셀 크기 | 내용 (슬라이스) | 사용처 | 960x540 문제 |
+---
+
+## 1. 현재 에셋 인벤토리 (전부 `Assets/Resources/Art/`)
+
+| 파일 | 픽셀 크기 | 내용 | 사용처 | 탑다운 전환 후 판정 |
 |---|---|---|---|---|
-| `LastStop_MvpSpritesheet_v1.png` | 1774x887 | `Player_Exterior_TopDown` 294x313, `Player_Interior_SideView` 322x330, `Enemy_Exterior_TopDown` 162x292, `Enemy_Interior_SideView` 340x235, `Bus_Exterior_Yellow` 1230x511, `Bus_Interior_Door_Seal` 342x466 | 내부 플레이어(0.70x0.90 wu), 외부 적(0.60x0.60 wu), **내부 적도 외부 탑다운 스프라이트 사용** (`SeparateInteriorEnemyVisual`, `LastStopPrototype.cs:807`에서 복사), 외부 버스(4.8x1.8 wu) | 내부 플레이어 약 **34x44 화면 px**, 가로 약 21% 눌림. 적 약 **29x29 px**, 162x292 원본을 정사각형에 넣어 가로 약 1.8배 늘어남. 내부에 탑다운 적이 나와 시점이 맞지 않음(`Enemy_Interior_SideView` 미사용). 버스 236x88 px, 약 11% 비균등. `Player_Exterior_TopDown`은 캐릭터가 외부에 나오지 않으므로 미사용. `Bus_Interior_Door_Seal`은 **봉인 메커닉이 없으므로** 폐기 대상. 원본이 약 10–25배 축소되어 디테일이 뭉개지고 픽셀 그리드가 없다. |
-| `LastStop_GuardSwing_v6.png` | 896x330 | 448x330 2프레임 (contact / follow-through). 메타 자동 슬라이스에 7x6 같은 잔여 조각 15개 | `ConfigureInteriorSwing`이 직접 `Sprite.Create`로 자름 (가로 448 고정, idle 너비 322 검사) | 2프레임뿐이라 걷기/콤보 구분이 없다. 노란 스윙 궤적이 그림에 포함되어 있어 좌우 반전·콤보별 변화가 어렵다. 코드가 크기에 하드코딩되어 있어 교체 시 코드도 바꿔야 한다. |
-| `LastStop_InteriorCore_v1.png` | 1254x1254 | 코어 본체 1185x1207 + 잔여 조각 19개 | 내부 코어 (0.96x1.05 wu) | 화면 약 **47x52 px**, 25배 축소로 화면 그래프·버튼이 읽히지 않는다. 저HP·피격 상태는 색 틴트로만 표현된다. |
-| `LastStop_CombatVfx_v1.png` | 1774x887 | `Vfx_Bean_Projectile`, `Vfx_Bubble_Projectile`, `Vfx_Flame_Loop`, `Vfx_Hit`, `Vfx_Enemy_Death`, `Vfx_Seal_Complete`. 코드가 (310,632,150,175) 영역을 `Vfx_Bus_Muzzle`로 별도 생성 | 탄환, 화염, 피격, 사망, 버스 궤적, 포구 섬광 | 각 효과가 다프레임 스트립인데 슬라이스는 1개씩이라 애니메이션 없이 첫 묶음이 통째로 표시된다. 빨강·초록 색번짐(halo)이 보인다. `Vfx_Seal_Complete`(자물쇠)는 봉인 메커닉이 없으므로 폐기 대상. 포구 섬광이 반짝이 별 모양이라 포구 위치를 알려주지 못한다. |
-| `LastStop_NightBusInterior_v1.png` | 1672x941 | 내부 배경 1장 | 내부 배경 (약 21.6x11.5 wu → 약 1058x565 화면 px) | 0.63배 Point 축소라 1–2 px 선(손잡이, 좌석 무늬)이 끊기고 스크롤 없이도 계단 현상이 보인다. 배경 디테일이 캐릭터보다 촘촘해 캐릭터가 묻힌다. 노란 기둥(#DF9717 계열)이 플레이어 주황 재킷과 색이 비슷하다. |
-| `LastStop_NightRoad_v1.png` | 1672x941 | 외부 배경 1장 (측면 시점 거리) | 외부 배경 3장 반복 스크롤 (13.2 wu 높이 → 약 0.69배) | 축소 계단 현상(위와 같음). **배경은 측면 시점인데 GameDesign.md는 외부를 탑다운으로 정의**하고 적은 원형으로 스폰된다. 루프 무기 시점 결정에 영향을 준다(8절 질문 1). |
-| (없음) `LastStop_BusBody_v2`, `LastStop_BusWheels_v2` | — | 코드가 로드를 시도함 | 바퀴 애니메이션 버스 | 파일이 없어 `Bus_Exterior_Yellow`로 대체된다. |
-| (없음) 루프 무기 | — | — | — | Tasks.md BLOCKED: 4방향 컨셉이 960x540 검토에서 위/아래 가독성과 아래 방향 포구 위치를 통과하지 못해 임포트하지 않았다. |
+| `LastStop_MvpSpritesheet_v1.png` | 1774x887 | `Player_Exterior_TopDown` 294x313, `Player_Interior_SideView` 322x330, `Enemy_Exterior_TopDown` 162x292, `Enemy_Interior_SideView` 340x235, `Bus_Exterior_Yellow` 1230x511, `Bus_Interior_Door_Seal` 342x466 | 내부 플레이어, 외부 적, 내부 적(외부 스프라이트 복사), 외부 버스 | `Player_Exterior_TopDown`(현재 미사용)과 `Enemy_Exterior_TopDown`은 **탑다운 캐릭터 디자인 참조**로 쓸 수 있다. `Player_Interior_SideView`, `Enemy_Interior_SideView`는 폐기 후보. `Bus_Exterior_Yellow`는 측면 3/4 시점이라 탑다운 외부와 맞지 않는다. `Bus_Interior_Door_Seal`은 봉인 메커닉이 없으므로 폐기 후보. |
+| `LastStop_GuardSwing_v6.png` | 896x330 | 448x330 2프레임(contact/follow-through), 자동 슬라이스 잔여 조각 15개 | `ConfigureInteriorSwing`이 직접 자름(가로 448 하드코딩) | 측면 전용이라 폐기 후보. 교체 시 코드의 하드코딩도 제거해야 한다. |
+| `LastStop_InteriorCore_v1.png` | 1254x1254 | 코어 본체 1185x1207 + 잔여 조각 19개 | 내부 코어(0.96x1.05 wu) | 정면 단말기 디자인. 탑다운에서도 정면 3/4로 쓸 수 있으나 25배 축소로 읽히지 않는다. A3로 교체. |
+| `LastStop_CombatVfx_v1.png` | 1774x887 | `Vfx_Bean_Projectile`, `Vfx_Bubble_Projectile`, `Vfx_Flame_Loop`, `Vfx_Hit`, `Vfx_Enemy_Death`, `Vfx_Seal_Complete`, 코드가 별도 생성하는 `Vfx_Bus_Muzzle` | 탄환, 화염, 피격, 사망, 버스 궤적, 포구 섬광 | 다프레임 스트립이 1장으로 슬라이스되어 애니메이션이 없다. 색번짐. `Vfx_Seal_Complete`는 폐기 후보. 시점 중립적이라 재제작 전까지 유지 가능. |
+| `LastStop_NightBusInterior_v1.png` | 1672x941 | 측면 내부 배경 1장 | 내부 배경 | 측면 시점이라 탑다운 내부에서 쓸 수 없다. A4 타일·소품으로 교체. |
+| `LastStop_NightRoad_v1.png` | 1672x941 | 측면 거리 배경 1장 | 외부 배경 3장 반복 | 측면 시점이라 탑다운 외부와 맞지 않는다. 탑다운 도로 타일은 다음 우선순위(7절). |
+| (없음) `LastStop_BusBody_v2`, `LastStop_BusWheels_v2` | — | 코드가 로드를 시도함(`:281-282`) | 바퀴 애니 버스 | 파일이 없어 `Bus_Exterior_Yellow`로 대체된다. A5에서 **같은 파일 이름과 슬라이스 계약**으로 탑다운 버전을 사양화했다. |
+| (없음) 지붕 무기 | — | — | — | Tasks.md BLOCKED(측면 4방향의 위/아래 가독성 실패). 탑다운 지붕 시점에서는 포신이 지붕 평면에 누워 있어 위/아래 문제가 구조적으로 줄어든다. A6로 재사양. |
 
-### 공통 기술 문제
+### 공통 기술 문제 (기존 에셋, 그대로 유효)
 
-1. **진짜 픽셀아트가 아니다.** 이미지 생성 결과를 그대로 사용해 픽셀 그리드가 없고 색이 수만 개이다(시트당 약 4.6만–31만 색).
-2. **알파가 반투명이다.** 보이는 픽셀 대부분이 alpha 192–254이고 완전 불투명 픽셀은 수백 개뿐이다. 외곽에 alpha 1–63 후광이 수만 픽셀 있다. 어두운 배경에서 테두리가 번지고 메타 자동 슬라이스에 잔여 조각이 생기는 원인이다.
-3. **임포트 설정이 섞여 있다.** Default 플랫폼은 Compression None이지만 **Standalone 오버라이드가 `textureCompression: 1`(압축)**이다. 배경 2장은 `filterMode: 1`(Bilinear)이고 런타임에 Point로 바꾼다. PPU는 100이지만 코드가 크기를 강제하므로 의미가 없다.
-4. **비균등 스케일**로 원본 비율이 깨진다. 프레임별로 크기가 다르면 같은 world 크기로 늘려지면서 출렁인다.
-5. **프레임 애니메이션이 없다.** 움직임은 `LastStopSpriteMotion`의 스케일·기울기·틴트뿐이다(Tasks.md REVIEW).
+1. 진짜 픽셀아트가 아니다. 생성 이미지를 그대로 써서 픽셀 그리드가 없고 시트당 약 4.6만–31만 색이다.
+2. 알파가 반투명이다. 보이는 픽셀 대부분이 alpha 192–254이고 외곽에 alpha 1–63 후광이 수만 픽셀 있다.
+3. 임포트 설정이 섞여 있다. Default는 Compression None, **Standalone 오버라이드는 `textureCompression: 1`**. 배경 2장은 Bilinear(런타임 Point). PPU 100은 코드가 크기를 강제해 의미가 없다.
+4. 비균등 스케일로 비율이 깨진다.
+5. 프레임 애니메이션이 없다(움직임은 `LastStopSpriteMotion`의 스케일·기울기·틴트뿐).
 
 ---
 
-## 2. 공통 규격 (신규 에셋 전체)
+## 2. 스타일 가이드 (승인 목업 A에서 도출)
 
-### 2.1 픽셀 배율 제안 (Development 결정 필요)
+목업은 AI가 만든 분위기 이미지이며 실제 픽셀 그리드가 없다(1672x941에서 "가짜 픽셀" 한 칸이 약 2.5–3 px로 일정하지 않다). 아래 규칙은 목업의 **색, 빛, 실루엣, 밀도 느낌**을 가져오고, 그리드·색 수·알파는 우리가 강제한다.
 
-960x540에서 **아트 1픽셀 = 화면 2x2 픽셀**(가상 해상도 480x270)을 목표로 한다.
+### 2.1 목업에서 읽은 특징
 
-- **권장안 B (프레이밍 변화 최소):** 카메라 orthographic size 5.5 → **5.625**, 스프라이트 **PPU 24**. 1 wu = 48 화면 px = 24 아트 px이므로 정확히 2배이다. 화면 세로가 11 → 11.25 wu로 약 2%만 늘어난다.
-- 대안 A: Pixel Perfect Camera(참조 해상도 480x270, PPU 32). 화면 세로가 8.4375 wu로 줄어 스폰·배치 좌표를 다시 잡아야 하므로 이번 스프린트에는 권장하지 않는다.
-- 어느 쪽이든 신규 스프라이트는 `CreateBlock`의 강제 크기 대신 **스케일 1(원본 px / PPU)**로 배치해야 정수 배율이 유지된다. 이것은 Development 소관이며 Art는 코드나 씬을 수정하지 않는다.
-- 이 문서의 모든 world 크기는 **안 B(PPU 24)** 기준이다.
+- 밤, 비 젖은 아스팔트. 전체는 짙은 남색·청보라, 따뜻한 빛은 국소적이다.
+- 버스 지붕을 걷어낸 "돌하우스" 3/4 탑다운. 위쪽 벽은 안쪽 면(창문, 앰버 천장등)이 보이고, 아래쪽 벽은 윗면 가장자리만 보인다.
+- 캐릭터는 위에서 약 30–40도로 내려다보며 얼굴과 몸 앞면이 보인다. 머리 약 1/5.5 비율(치비 아님).
+- 주요 대비 3축: **앰버 실내등**(따뜻함, 안전), **시안 코어 발광**(지켜야 할 대상), **빨강**(위험: 적 상처, 피, HP, 후미등).
+- 노란 손잡이 기둥이 강한 수직 리듬을 만든다. 좌석은 남색 천에 주황 점무늬.
+- 캐릭터는 두꺼운 어두운 외곽선으로 배경에서 분리된다. 바닥 아래에는 짧은 어두운 그림자가 있다.
 
-### 2.2 그리기 규칙
+거절안 B와의 차이(피해야 할 것): 부드러운 그라데이션, 페인터리 붓질, 블룸 번짐, 사진 같은 질감, 얇거나 없는 외곽선.
 
-- 원본은 목표 픽셀 크기 그대로 그린다(업스케일 원본 금지). 반투명 금지: alpha는 0 또는 255만 쓴다.
-- 1px 외곽선은 공용 `#141019`를 쓴다. 안티앨리어싱 없음, 디더링은 최소화한다.
-- 광원은 왼쪽 위(천장 형광등)에서 온다. 그림자는 스프라이트에 넣지 않는다(바닥 그림자는 필요하면 별도 스프라이트).
-- 기본 방향은 **오른쪽을 본다**. 왼쪽은 `flipX`를 쓴다. Unity `flipX`는 피벗 기준으로 반전되므로 피벗이 발 위치에 정확히 있어야 한다.
-- 모든 프레임의 발 기준선은 셀 맨 아래 행(y=0)이고, 몸통 중심 x는 피벗 x에 고정한다(idle/walk에서 몸통 흔들림은 ±1px 이내).
-- 배경 대비: 내부 바닥은 `#12161F`–`#1C2026`, 벽은 `#252224`–`#352E30`, 기둥은 `#DF9717`이다. 캐릭터의 가장 밝은 면은 이보다 명도가 확실히 높아야 하고, 기둥색 `#DF9717`과 같은 색은 쓰지 않는다.
+### 2.2 마스터 팔레트 (hex)
 
-### 2.3 파일 이름, 위치, 슬라이스 이름
+목업에서 샘플링한 값(예: 바닥 `#2F314C`/`#414465`, 선체 `#1E2447`/`#35427B`, 기둥 `#FBD631`, 앰버 `#FB9E3A`/`#FFC260`, 코어 하이라이트 `#D3FFFF`)을 기준으로 램프를 정리했다. **모든 신규 에셋은 이 표의 색으로 매핑**한다. 에셋별 색 수 상한은 3절 각 항목에 있다.
 
-- 이름: `LastStop_<대상>_<시점>_<내용>_v<N>.png`. 기존 파일을 같은 이름으로 덮어쓰지 않는다. 새 파일에는 새 `.meta`가 생기고, 기존 `.meta` GUID는 건드리지 않는다.
-- 목표 경로: `Assets/Art/<분류>/...` (아래 각 항목). 현재 코드는 `Resources/Art`만 로드하므로, **Resources로 옮길지 직렬화 참조로 바꿀지는 Development가 결정**한다(통합 시 협의).
-- 슬라이스 이름: `<접두어>_<애니>_<두 자리 번호>`, 예: `PlayerInt_Walk_00`.
+| 램프 | 어두움 → 밝음 | 용도 |
+|---|---|---|
+| 외곽선 | `#07080F` (주 외곽선), `#141526` (내부 선) | 모든 캐릭터·소품 외곽 |
+| 밤 환경 (차가움) | `#0E162D` `#151C34` `#21293B` `#30436B` `#405F82` `#6E86B0` | 도로, 그림자, 림 하이라이트 |
+| 실내 바닥 | `#1D1E32` `#2F314C` `#414465` `#53506E` | 바닥 타일, 통로 |
+| 선체·벽 | `#1E2447` `#2A3563` `#35427B` `#5A6AA8` | 버스 벽, 창틀, 내부 금속 |
+| 좌석 | `#1A2C5B` `#25305A` `#3A4C8C` + 무늬 `#E07A3A` | 좌석 천 |
+| 노란 기둥 | `#8A6A12` `#D9A521` `#FBD631` | 손잡이 기둥, 바닥 안내선 |
+| 앰버 빛 | `#7A4A1E` `#C9781F` `#FB9E3A` `#FFC260` `#FFE9A8` `#FFFBDF` | 천장등, 창문 반사, 문 조명, 가로등 |
+| 시안 코어 | `#0B3A4A` `#127C8C` `#2EC4D6` `#7EF2F5` `#D3FFFF` | 코어, 코어 발광, 선택 링 |
+| 위험 빨강 | `#3A0E16` `#7A1622` `#C02A34` `#E03A3A` `#FF7A6A` | 피, 상처, 후미등, 저HP 경고 |
+| 해저드 | `#C9A227` + `#07080F` 줄무늬 | 코어 받침, 문턱 |
+| 식생 | `#0C1118` `#16302A` `#24503C` | 외부 나무 |
 
-### 2.4 Unity 임포트 설정 (신규 시트 공통)
+캐릭터 고유 램프(기존 디자인 유지, 마스터 팔레트와 함께 사용):
+
+| 대상 | 색 |
+|---|---|
+| 플레이어 | 머리 `#4A221E` `#6A302B` `#844030` `#A1683E`, 피부 `#8E5A3C` `#D98E5A` `#F1B276`, 재킷 `#7A3414` `#B8581C` `#E07A26` `#F6B04A`(기둥 노랑 `#FBD631`과 구분되도록 붉은 주황), 털 깃 `#C9B89A` `#F3E6CF`, 바지 `#1E2238` `#2E3550` `#46507A`, 부츠 `#3A2826` `#5A3F38`, 배낭 `#3F4A20` `#5E6B2E` `#7E8C40`, 곤봉 `#4E2E1A` `#7A4A2A` `#A87048`, 못 `#B8C0CC` |
+| 기본 적 (기존 Rusher, 기본안) | 몸 `#2E1828` `#4B293D` `#703950` `#834859`, 림 `#A7678A`, 줄무늬 `#D99688` `#FBC9B3`, 눈 `#FFD23A`, 입 `#C0303A`, 이빨·발톱 `#F3E6CF` |
+| 기본 적 (목업 좀비, 대안) | 피부 `#5E6B4A` `#8A9670` `#B4BC98`, 옷 `#3A3550` `#6A607E` `#BEB7D3`, 상처 마스터 빨강, 눈 `#FFE9A8` |
+
+### 2.3 외곽선 규칙
+
+- 캐릭터·적·코어·소품: 실루엣 바깥쪽 **1 아트 px 외곽선 `#07080F`** (1080p에서 2 화면 px로 보여 목업의 굵은 선과 같다).
+- 내부 형태선: 외곽선 색 대신 해당 재질의 가장 어두운 색. 얼굴·손 같은 핵심 부위만 `#141526`.
+- 빛을 받는 윗면 외곽(머리, 어깨)은 선택적으로 램프 가장 어두운 색으로 바꿀 수 있다(sel-out). 아래쪽과 그림자 쪽 외곽은 항상 `#07080F`.
+- 타일(바닥, 벽): 외곽선 없음. 경계는 명도 차이로 나눈다.
+- 발광체(코어 빛, 램프, VFX): 외곽선 없음.
+- 실루엣 바깥 안티앨리어싱 금지. 실루엣 **안쪽**의 곡선에만 중간색 1단계 수동 AA를 허용한다(고해상도 픽셀아트 품질용).
+
+### 2.4 빛과 음영
+
+- **고정(그려 넣는) 빛:** 주광은 화면 위쪽(천장 앰버등)에서 내려온다. 머리·어깨·윗면은 따뜻한 쪽, 아래·뒷면은 남보라 쪽으로 **색조를 이동한 3–4단 램프**. 그라데이션 없음.
+- **림:** 캐릭터 아래쪽/뒤쪽 가장자리에 차가운 `#6E86B0` 1 px 림(어두운 바닥과 분리용, 목업 특징).
+- **시안 코어광과 국소 앰버광은 스프라이트에 굽지 않는다.** 위치에 따라 바뀌므로 Development가 URP 2D Light(2D Renderer 사용 시) 또는 가산 혼합 글로우 스프라이트로 처리하도록 제안한다. Art는 글로우 스프라이트(A3-G)만 제공한다.
+- **그림자:** 캐릭터 시트에 넣지 않는다. 공용 바닥 그림자 스프라이트(타원, `#07080F` 단색, 알파는 0/255이고 SpriteRenderer 색 알파로 반투명 처리) 별도 제공.
+- **디더링:** 넓은 면(바닥, 벽)에서만 2x2 체크 디더 허용. 캐릭터에는 쓰지 않는다.
+- 외부: 차가운 달빛/가로등 키. 버스 전조등·후미등은 별도 가산 스프라이트.
+
+### 2.5 픽셀 밀도 규칙
+
+- 모든 신규 에셋은 **같은 밀도(PPU 48, 4절)**로 그린다. 한 화면에서 픽셀 크기가 섞이면 안 된다(업스케일·다운스케일 원본 금지, 런타임 비균등 스케일 금지).
+- 스프라이트 회전으로 방향을 표현하지 않는다(회전하면 그리드가 깨진다). 방향은 그려서 만든다. 예외: 0.1초 이하로 사라지는 VFX(포구 섬광, 타격 섬광)는 회전 허용.
+- 캐릭터 키 기준: 플레이어 **80 px**, 기본 적 **64–72 px**, 코어 **약 104 px**(디렉터 범위 64–96 px 안, 코어는 오브젝트라 예외).
+- 디테일 하한: 1 px 단독 점은 눈 하이라이트, 못, 점무늬에만. 나머지 형태는 2 px 이상 폭.
+
+### 2.6 AI 생성물 일관성 유지 방법
+
+1. **공통 스타일 블록(5.1절)을 모든 프롬프트 앞에 그대로 붙인다.** 단어를 바꾸지 않는다.
+2. **참조 이미지 2장을 항상 첨부:** (a) 승인 목업 A(스타일), (b) 해당 캐릭터의 승인된 모델 시트(디자인). 모델 시트가 없으면 먼저 모델 시트(정지 포즈 3방향)를 생성·승인한 뒤 애니메이션 행을 만든다.
+3. **한 번에 한 애니메이션 × 한 방향(1행)만 생성.** 전체 시트를 한 번에 요청하지 않는다.
+4. 같은 대화 스레드 안에서 이어서 생성하고, 앞서 승인된 행을 다시 첨부해 "same character, same proportions, same palette"를 지시한다.
+5. 팔레트 hex를 프롬프트에 적고, 후처리에서 **마스터 팔레트로 강제 매핑**한다(생성 색은 믿지 않는다).
+6. 배경은 단색 크로마. 마젠타 `#FF00FF` 기본, 분홍·자주가 들어간 대상(기본 적)은 초록 `#00FF00`.
+7. 거절 기준(재생성): 외곽선 없음, 그라데이션·블룸, 프레임마다 키가 3 px 이상 다름, 방향이 틀림, 배경에 그림자·질감, 텍스트·격자선 포함.
+8. 생성 결과는 밑그림이다. **사람이 Aseprite에서 얼굴, 손, 무기, 발 기준선을 반드시 정리**한 뒤 납품한다.
+
+---
+
+## 3. 목표 해상도와 픽셀 배율 (Development 결정 요청)
+
+### 3.1 제안 (권장안)
+
+| 항목 | 값 | 비고 |
+|---|---|---|
+| 가상(아트) 해상도 | **960x540 아트 px** | 16:9 |
+| 기준 출력 해상도 | **1920x1080** (아트 1 px = 화면 2x2 px) | 2560x1440은 비정수(2.67), 3840x2160은 4x |
+| 리뷰 해상도 | 960x540 Game view = 1x (기존 리뷰 관행 유지), 최종 판정은 1920x1080 | |
+| Sprite PPU | **48** | 1 wu = 48 아트 px |
+| 카메라 ortho size | 5.5 → **5.625** (화면 11.25 x 20 wu) | 현재 11 wu에서 약 2%만 늘어 스폰·배치 좌표 변경이 거의 없다 |
+| Pixel Perfect Camera (URP) | Assets PPU 48, Reference Resolution 960x540, Grid Snapping: Upscale Render Texture(또는 Pixel Snapping), Crop Frame 없음 | 내부·외부 카메라 모두 |
+| 배치 | 신규 스프라이트는 **스케일 1**(원본 px / PPU). `CreateBlock`의 강제 크기 사용 중지 | Development 소관 |
+| 정렬 | Transparency Sort Mode Custom Axis (0, 1, 0), 캐릭터·소품 피벗은 발/바닥 | y-정렬 탑다운 |
+
+환산: 플레이어 80 px = 1.67 wu = 1080p에서 160 화면 px(화면 높이의 약 15%, 목업의 플레이어 비율 약 16%와 비슷).
+
+### 3.2 대안과 단점
+
+- **1280x720 창모드:** 960x540 기준으로 1.33배라 비정수. Pixel Perfect Camera의 Upscale Render Texture를 쓰면 화면 전체가 같은 비율로 확대되어 일관성은 유지되지만 픽셀 크기가 1–2 px로 섞인다. 720p를 주 목표로 할 경우 가상 640x360(PPU 32, 720p 2x/1080p 3x)도 가능하나, 캐릭터 64–96 px가 화면 높이의 18–27%가 되어 내부가 좁아진다. 권장하지 않는다.
+- **PPU 64 / ortho 4.22:** 같은 960x540이지만 화면이 8.4 wu로 줄어 기존 좌표를 다시 잡아야 한다.
+- **외부 카메라만 줌아웃(ortho 11.25):** 외부 군중을 더 보여주지만 외부 픽셀이 1080p에서 1x가 되어 내부(2x)와 밀도가 달라진다. 디렉터 질문 3 참고. 권장안은 외부도 같은 밀도를 쓰고 **외부 전용 작은 스프라이트**(A2-E)로 군중감을 낸다.
+
+---
+
+## 4. 공통 규격 (신규 에셋 전체)
+
+### 4.1 방향 규약
+
+- 탑다운 방향 이름: `D`(아래, 화면을 향함), `U`(위), `R`(오른쪽), `L`(왼쪽), 대각선 `DR` `UR` `DL` `UL`.
+- **4방향 권장안:** `D`, `U`, `R` 3개를 그리고 `L`은 `flipX`. 8방향은 `D` `DR` `R` `UR` `U` 5개를 그리고 `DL` `L` `UL`은 `flipX`(디렉터 질문 1).
+- `flipX`는 피벗 기준 반전이므로 피벗 x가 몸통 중심에 정확히 있어야 한다. 반전하면 곤봉을 든 손이 바뀌지만 이 장르에서 허용되는 수준으로 본다.
+- 빛은 위쪽에서 오므로 좌우 반전해도 조명이 깨지지 않는다(이전 판의 "왼쪽 위 광원" 규칙을 바꾼 이유).
+
+### 4.2 파일 이름, 위치, 슬라이스 이름
+
+- 이름: `LastStop_<대상>_TopDown_<내용>_v<N>.png`. 기존 파일을 같은 이름으로 덮어쓰지 않는다. 기존 `.meta` GUID는 건드리지 않는다.
+- 예외: A5 외부 버스는 코드가 이미 찾는 `LastStop_BusBody_v2` / `LastStop_BusWheels_v2` 이름과 슬라이스 이름을 쓴다.
+- 목표 경로: `Assets/Art/<분류>/...`. 현재 코드는 `Resources/Art`만 로드하므로 Resources로 옮길지 직렬화 참조로 바꿀지는 **Development가 결정**한다.
+- 슬라이스 이름: `<접두어>_<애니>_<방향>_<두 자리 번호>`, 예: `Player_Walk_D_00`.
+- 원본 작업 파일(`.aseprite`)은 Art 작업 폴더에 보관한다. Unity에 `.aseprite`를 직접 넣을지(Aseprite Importer 설치됨)는 Development와 협의하고, 기본 납품은 PNG 시트이다.
+
+### 4.3 Unity 임포트 설정 (신규 시트 공통)
 
 | 설정 | 값 |
 |---|---|
 | Texture Type | Sprite (2D and UI) |
-| Sprite Mode | Multiple (Grid By Cell Size, 각 항목의 셀 크기, Offset 0, Padding 0) |
-| Pixels Per Unit | **24** (안 A 채택 시 32) |
+| Sprite Mode | Multiple (Grid By Cell Size, 항목별 셀 크기, Offset 0, Padding 0). 타일셋도 동일 |
+| Pixels Per Unit | **48** |
 | Mesh Type | Full Rect |
 | Extrude Edges | 0 |
-| Pivot | Custom, 항목별 값 (모든 슬라이스 동일) |
+| Pivot | Custom, 항목별 값 (같은 시트 모든 슬라이스 동일) |
 | Filter Mode | **Point (no filter)** |
-| Compression | **None** — Default와 Standalone 등 **모든 플랫폼 오버라이드**에서 |
+| Compression | **None — Default와 Standalone 등 모든 플랫폼 오버라이드** |
 | Generate Mip Maps | Off |
 | Wrap Mode | Clamp |
 | sRGB | On |
 | Alpha Is Transparency | On |
-| Max Size | 2048 (시트보다 크게) |
+| Max Size | 4096 (시트보다 크게) |
 | Read/Write | Off |
 
 ---
 
-## 3. 우선순위 신규 에셋 사양
+## 5. 우선순위 에셋 사양
 
-프레임 속도는 표시 목표값이며 실제 재생 연결은 Development의 일이다.
+프레임 속도는 표시 목표값이며 재생 연결은 Development 일이다. 모든 피벗은 셀 왼쪽 아래 (0,0) 기준 픽셀 좌표와 정규화 값을 같이 적었다.
 
-### A1. 내부 플레이어 (Rookie Guard, 측면) — 우선순위 1
-
-| 항목 | 값 |
-|---|---|
-| 파일 | `Assets/Art/Characters/Player/LastStop_Player_Interior_Sheet_v1.png` |
-| 셀 | **96x64 px**, 6열 x 6행 → 시트 **576x384** |
-| 캐릭터 크기 | 머리부터 발까지 약 48 px(2.0 wu, 화면 96 px), 몸통 폭 약 22–26 px. 현재 화면 44 px의 약 2.2배 |
-| 피벗 | 발 중앙 (36, 0) → **(0.375, 0)**. 앞쪽 60 px는 공격 리치 공간 |
-| 슬라이스 접두어 | `PlayerInt` |
-
-| 행 | 애니 | 프레임 | 속도 | 비고 |
-|---|---|---|---|---|
-| 0 | Idle | 4 | 6 fps | 호흡 1px, 곤봉은 내린 상태 |
-| 1 | Walk | 6 | 10 fps | 루프, 접지 프레임 0과 3 |
-| 2 | AttackA (1타) | 3 | 약 19 fps (0.16초) | **0 = contact**(판정이 입력 즉시이므로 예비동작 없음), 1 = follow-through, 2 = recover. 수평 스윙 |
-| 3 | AttackB (2타) | 3 | 약 19 fps | 0 = contact(올려치기), 1, 2 |
-| 4 | AttackC (3타 마무리) | 4 | 약 20 fps (0.20초) | 0 = contact(내려찍기), 1 = 임팩트 스미어, 2, 3 = recover. 가장 큰 실루엣 |
-| 5 | Hurt | 2 | 12 fps | 뒤로 젖힘. 흰색 플래시는 코드가 처리하므로 그림은 원색 |
-
-- 스윙 궤적(smear)은 캐릭터 시트에 **넣지 않는다**. 필요하면 별도 VFX로 만든다. 곤봉 끝 스미어는 2–3px 단색 잔상까지만 허용한다.
-- 팔레트(최대 20색 + 외곽선, 기존 디자인 유지): 머리 `#6A302B` `#844030` `#A1683E`, 피부 `#F1B276` `#D98E5A`, 재킷 `#E07A26` `#B8581C` `#F6B04A`(기둥색 `#DF9717`과 구분되도록 붉은 쪽으로 이동), 털 깃 `#F3E6CF`, 바지 `#2E3550` `#1E2238`, 부츠 `#5A3F38` `#3A2826`, 배낭 `#5E6B2E` `#3F4A20`, 곤봉 `#7A4A2A` `#4E2E1A`, 가시 `#B8C0CC`, 눈 `#141019`.
-
-### A2. 내부 적 (Rusher, 측면) — 우선순위 1
-
-| 항목 | 값 |
-|---|---|
-| 파일 | `Assets/Art/Characters/Enemies/LastStop_Rusher_Interior_Sheet_v1.png` |
-| 셀 | **80x48 px**, 6열 x 5행 → 시트 **480x240** |
-| 캐릭터 크기 | 몸길이 약 44 px(꼬리 포함), 키 약 30 px(1.25 wu, 화면 60 px). 플레이어보다 확실히 작게 |
-| 피벗 | 앞발과 뒷발 사이 바닥 (32, 0) → **(0.4, 0)**. 오른쪽(코어 방향)을 보고, 앞쪽 공간은 덤벼들기용 |
-| 슬라이스 접두어 | `RusherInt` |
-
-| 행 | 애니 | 프레임 | 속도 | 비고 |
-|---|---|---|---|---|
-| 0 | Walk(질주) | 6 | 12 fps | 루프, 꼬리 흔들림 |
-| 1 | Attack | 4 | 12 fps (약 0.33초) | 0 = 웅크림, 1 = 덤벼듦, **2 = 물기/할퀴기 hit 프레임**, 3 = 복귀. 0.8초 공격 주기 안에 끝난다. hit 프레임과 데미지 타이밍 동기화는 Development에 요청 |
-| 2 | Hurt | 2 | 12 fps | 넉백 자세 |
-| 3 | Death | 5 | 12 fps | 마지막 프레임은 거의 빈 연기 2–3점. 기존 `Vfx_Enemy_Death`와 겹쳐도 읽히게 |
-| 4 | Breach(진입) | 3 | 10 fps | 문 쪽에서 튀어 들어와 착지. `TriggerEntry`와 연결 |
-
-- 50마리가 겹치는 경보 상황을 고려해 실루엣을 단순하게 한다(큰 꼬리, 밝은 눈, 분홍 줄무늬).
-- 팔레트(최대 14색 + 외곽선, 크로마는 분홍과 겹치지 않도록 **초록 `#00FF00`**): 몸 `#4B293D` `#703950` `#834859`, 윗면 림라이트 `#A7678A`(어두운 바닥과 분리), 줄무늬 `#D99688` `#FBC9B3`, 눈 `#FFD23A`, 입 `#C0303A`, 이빨·발톱 `#F3E6CF`, 외곽선 `#2B0C21` 또는 공용 `#141019`.
-
-### A3. 루프 무기 (콩알포, 4방향) — 우선순위 1 (Tasks.md BLOCKED 해소용)
-
-| 항목 | 값 |
-|---|---|
-| 파일 | `Assets/Art/Vehicles/Weapons/LastStop_RoofWeapon_Bean_Sheet_v1.png` |
-| 셀 | **32x32 px**, 3열(Idle, Recoil, Settle) x 4행(R, L, U, D) → 시트 **96x128** |
-| 화면 크기 | 셀 64x64 화면 px. 실제 포탑 몸체는 약 20x14 px(화면 40x28)이며 현재 버스(화면 236x88) 지붕 위에 올라간다 |
-| 피벗 | 포탑 회전 중심/장착점 (16, 16) → **(0.5, 0.5)**. 아래 방향 포신이 장착점 아래로 내려갈 공간이 필요해서 중앙에 둔다 |
-| 장착 위치 | 현재 코드의 포구 기준점과 맞춰 버스 중심 + 약 (0.4, 0.75) wu. 최종값은 Development가 정한다 |
-| 슬라이스 접두어 | `RoofBean` (예: `RoofBean_R_00`, `RoofBean_D_01`) |
-
-**포구 좌표 (필수 납품 데이터).** 셀 왼쪽 아래를 (0,0)으로 하는 픽셀 경계 좌표이다. 포신 끝 개구부 중앙이 이 점에서 1px 안에 있어야 한다. 3프레임 모두 같은 점이다(반동 프레임에서 포신이 1–2px 뒤로 물러나도 포구 기준점은 Idle 값을 쓴다).
-
-| 방향 | 포구 점 (px) | 피벗 기준 오프셋 (px) | world 오프셋 (PPU 24) |
+| ID | 에셋 | 우선순위 | 레이아웃 의존 |
 |---|---|---|---|
-| R (오른쪽) | (31, 18) | (+15, +2) | (+0.625, +0.083) |
-| L (왼쪽) | (1, 18) | (−15, +2) | (−0.625, +0.083) |
-| U (화면 위쪽) | (16, 31) | (0, +15) | (0, +0.625) |
-| D (화면 아래쪽) | (16, 1) | (0, −15) | (0, −0.625) |
+| A1 | 플레이어 (곤봉 경비원) | P1 | 공격 방향 수는 조작 사양 의존 |
+| A2 | 기본 적 (내부) | P1 | 진입 애니는 문 위치 의존 [잠정] |
+| A3 | 코어 + 발광 | P1 | 없음 |
+| A4 | 내부 타일·소품 | P1 [잠정] | 전부 |
+| A5 | 외부 버스 탑다운 | P2 | 앞 방향 |
+| A6 | 지붕 무기 + 포구 섬광 | P2 | 장착점은 A5 의존 |
+| A2-E | 외부 적 (작은 변형) | P3 | 디렉터 질문 3 |
+| SH | 공용 바닥 그림자 | P1 | 없음 |
 
-- 지난 컨셉이 실패한 원인이 위/아래 가독성이므로 다음 규칙을 강제한다.
-  - **U와 D도 포신을 실제 길이 12–14 px로 길게 그린다.** 원근 단축으로 짧게 줄이지 않는다.
-  - **D**: 포신이 장착점에서 아래로 뻗고, 끝에 4x3 px 어두운 구멍 `#141019`과 그것을 둘러싼 밝은 링 `#F6D365`을 그린다. 장착부(포탑 돔)는 포신 **뒤쪽(위)**에 둬서 포신이 돔을 가리게 한다.
-  - **U**: 포신이 돔 뒤로 올라간다. 돔이 포신 아래쪽을 가리고, 포신 끝에 밝은 링 2px.
-  - R/L: 포신 끝 2px을 밝은 링색으로 칠한다. L은 R의 단순 반전이 아니라 광원(왼쪽 위)을 유지해 다시 칠한다.
-  - 네 방향 모두 포신은 가장 밝은 금속색, 돔은 버스 노랑으로 해서 "어디를 겨누는지"가 색 대비로 먼저 읽히게 한다.
-- 포구 섬광(별도 시트): `Assets/Art/Vehicles/Weapons/LastStop_RoofWeapon_Bean_MuzzleFlash_v1.png`, **16x16 x 3프레임 → 48x16**, 오른쪽을 향함, 피벗 **(0, 0.5)**(왼쪽 가장자리 중앙 = 포구 점). 코드가 목표 방향으로 회전시킨다. 30 fps, 3프레임(0.1초). 반짝이 별이 아니라 **포신 방향의 원뿔 모양**이어야 한다.
-- 검수용 가이드(선택, 임포트 금지): 같은 크기 PNG에 각 셀의 포구 점을 `#FF00FF` 1px로 찍은 `..._MuzzleGuide_v1.png`. `Assets` 밖(예: Art 작업 폴더)에 두고, 위 표가 정본이다.
-- 팔레트(최대 12색 + 외곽선, 크로마 `#FF00FF`): 버스 노랑 `#E8B230` `#B98320` `#7A5418`, 금속 `#3C4163` `#5A6390` `#9AA3C0` `#D5DBEA`, 포구 링 `#F6D365`, 구멍 `#141019`, 콩알 포인트 `#C9D94A`.
-
-### A4. 내부 코어 — 우선순위 2
+### A1. 플레이어 — 곤봉 경비원 (탑다운)
 
 | 항목 | 값 |
 |---|---|
-| 파일 | `Assets/Art/Interior/LastStop_Core_Interior_Sheet_v1.png` |
-| 셀 | **56x64 px**, 4열 x 4행 → 시트 **224x256** |
-| 크기 | 본체 약 44x54 px(2.25 wu 높이, 화면 108 px). 플레이어(48 px)보다 약간 크게 |
-| 피벗 | 바닥 중앙 (28, 0) → **(0.5, 0)** |
-| 슬라이스 접두어 | `CoreInt` |
+| 파일 | `Assets/Art/Characters/Player/LastStop_Player_TopDown_Sheet_v1.png` |
+| 셀 | **128x128 px** |
+| 캐릭터 크기 | 머리부터 발까지 **80 px**, 어깨 폭 약 32 px. 위·아래·옆으로 곤봉 휘두를 여백 포함 |
+| 피벗 | 발 중앙 **(64, 24) → (0.5, 0.1875)**. 아래(D) 스윙이 발 아래 24 px까지 내려갈 공간 |
+| 방향 | 4방향 권장(D, U, R 그림 + L은 flipX). 8방향 선택 시 DR, UR 행 추가 |
+| 시트 배치 | 6열. 행 = 애니 x 방향(아래 표 순서, 방향 D→U→R) |
+| 시트 크기 | 4방향: 6열 x 18행 = **768x2304**. 8방향: 6열 x 30행 = 768x3840 |
+| 슬라이스 접두어 | `Player` |
+| 색 상한 | 32색 + 외곽선 |
+
+| 행 묶음 | 애니 | 프레임 | 속도 | 비고 |
+|---|---|---|---|---|
+| 0–2 | Idle (D/U/R) | 4 | 6 fps | 호흡 1 px, 곤봉 어깨에 걸침 |
+| 3–5 | Walk (D/U/R) | 6 | 10 fps | 루프, 접지 프레임 0과 3. 이동 5 wu/s 기준 보폭은 Dev와 맞춘다 |
+| 6–8 | AttackA 1타 (D/U/R) | 3 | 약 19 fps (0.16초) | **0 = contact**(판정이 입력 즉시라 예비동작 없음), 1 = follow-through, 2 = recover. 바라보는 방향 앞쪽으로 수평 휘두르기 |
+| 9–11 | AttackB 2타 | 3 | 약 19 fps | 반대 방향 되휘두르기 — P2 |
+| 12–14 | AttackC 3타 마무리 | 4 | 약 20 fps | 내려찍기, 가장 큰 실루엣 — P2 |
+| 15–17 | Hurt (D/U/R) | 2 | 12 fps | 뒤로 젖힘. 흰 플래시는 코드가 처리 |
+
+- **최소 납품(MVP):** Idle, Walk, AttackA, Hurt 각 3방향 = 45프레임. 콤보 B/C는 탑다운 조작 사양(Planning)이 3타 콤보를 유지할 때 만든다.
+- 스윙 궤적(smear)은 시트에 넣지 않는다. 별도 VFX `LastStop_Vfx_TopDown_BatArc_v1.png`(128x128 x 3프레임, 오른쪽 기준, 코드 회전 허용 — 2.5절 예외)로 만든다. 곤봉 끝 2–3 px 단색 잔상까지만 시트에 허용.
+- 디자인: 기존 `Player_Exterior_TopDown`/`Player_Interior_SideView`의 경비원(갈색 올림머리, 붉은 주황 패딩, 크림색 털 깃, 남색 바지, 갈색 부츠, 올리브 배낭, 못 박힌 나무 곤봉)을 목업 스타일로 다시 그린다. 목업의 남성 생존자 디자인으로 바꿀지는 디렉터 질문 2.
+
+### A2. 기본 적 — 내부 (탑다운)
+
+| 항목 | 값 |
+|---|---|
+| 파일 | `Assets/Art/Characters/Enemies/LastStop_Rusher_TopDown_Sheet_v1.png` |
+| 셀 | **96x96 px** |
+| 크기 | 키 약 **64 px**(사족 짐승은 머리 높이 기준), 몸길이(꼬리 포함) 약 70 px. 플레이어보다 확실히 작게 |
+| 피벗 | 발 중앙 **(48, 12) → (0.5, 0.125)** |
+| 방향 | 4방향(D, U, R + L flipX). Death와 Breach는 D 1방향 |
+| 시트 배치 | 6열 x 11행 = **576x1056** |
+| 슬라이스 접두어 | `Rusher` |
+| 크로마 | **초록 `#00FF00`** (분홍 줄무늬 보호) |
+| 색 상한 | 20색 + 외곽선 |
+
+| 행 | 애니 | 프레임 | 속도 | 비고 |
+|---|---|---|---|---|
+| 0–2 | Walk (D/U/R) | 6 | 12 fps | 루프, 꼬리 흔들림 |
+| 3–5 | Attack (D/U/R) | 4 | 12 fps (0.33초) | 0 = 웅크림, 1 = 덤벼듦, **2 = hit 프레임**, 3 = 복귀. 0.8초 주기 안. hit 프레임과 데미지 동기화는 Development 요청 |
+| 6–8 | Hit (D/U/R) | 2 | 12 fps | 넉백 자세. 흰 플래시는 코드 |
+| 9 | Death (D) | 6 | 12 fps | 쓰러짐 → 보라 연기 → 마지막 프레임은 연기 2–3점. 모든 방향 공용 |
+| 10 | Breach (D) [잠정] | 3 | 10 fps | 문에서 뛰어들어 착지. 문 위치가 정해지면 방향 추가 가능. `TriggerEntry`와 연결 |
+
+- 50마리가 겹치는 경보 상황을 위해 실루엣을 단순하게: 큰 꼬리, 노란 눈, 분홍 줄무늬. 위쪽 림 `#A7678A`.
+- 코드 연동: `SeparateInteriorEnemyVisual`(`LastStopPrototype.cs:807`)에서 외부 스프라이트 복사 대신 이 시트의 애니메이션을 써야 한다(Development).
+- 목업의 좀비 디자인으로 바꿀지는 디렉터 질문 2. 바꾸면 크기를 키 72 px, 2족 보행으로 하고 크로마는 마젠타로 돌린다.
+
+### A3. 코어 (탑다운 3/4 정면)
+
+| 항목 | 값 |
+|---|---|
+| 파일 | `Assets/Art/Interior/LastStop_Core_TopDown_Sheet_v1.png` |
+| 셀 | **128x128 px** |
+| 크기 | 본체 약 96x104 px(바닥 받침 포함). 플레이어(80 px)보다 크게 |
+| 피벗 | 받침 바닥 중앙 **(64, 12) → (0.5, 0.09375)** |
+| 방향 | 1방향(정면 3/4) |
+| 시트 배치 | 6열 x 4행 = **768x512** |
+| 슬라이스 접두어 | `Core` |
+| 색 상한 | 24색 + 외곽선 |
 
 | 행 | 상태 | 프레임 | 속도 | 비고 |
 |---|---|---|---|---|
-| 0 | Idle (정상) | 4 | 6 fps | 화면 파형 2px 이동, 초록 램프 깜빡임 |
-| 1 | LowHP (공유 HP 30% 이하) | 4 | 8 fps | 화면이 빨강 `#E0566A`, 경고 램프, 화면 금 1개 |
-| 2 | Hit | 2 | 15 fps | 프레임 0: 화면 흰색·몸체 1px 아래로 눌림. 흰 플래시 틴트는 코드에도 있으므로 과하지 않게 |
-| 3 | Destroyed | 1 (열 0만) | — | 게임오버 연출용. 화면 깨짐, 불꽃 없음(VFX가 담당) |
+| 0 | Idle | 6 | 8 fps | 시안 캡슐 안 에너지가 1–2 px씩 오르내림, 받침 램프 깜빡임 |
+| 1 | Hit | 3 | 15 fps | 0: 캡슐 흰색, 본체 1 px 아래로 눌림, 1: 원래 색 + 금 빛, 2: 복귀 |
+| 2 | LowHP (공유 HP 30% 이하) | 6 | 10 fps | 캡슐 빛이 시안 ↔ 빨강 `#E03A3A`로 깜빡임, 캡슐에 금 1개, 경고 램프 |
+| 3 | Destroyed | 1 | — | 캡슐 깨짐, 빛 꺼짐. 불꽃 없음(VFX 담당) |
 
-- 기존 디자인(화면 속 버스 아이콘, 3색 버튼, 해저드 줄무늬)을 유지하되 48px 높이에서 읽히도록 화면 아이콘은 버스 실루엣 1개와 파형만 남긴다. 볼트·통풍구는 제거한다.
-- 팔레트(최대 16색 + 외곽선, 크로마 `#FF00FF`): 몸체 `#1A1D33` `#2A3354` `#3C4163` `#5A6390`(윗면 림라이트 필수, 어두운 벽과 분리), 화면 `#33688E` `#2EA8B7` `#7EF2F5`, 버튼 `#8FD13A` `#3FE0E8` `#E0566A`, 앰버 `#F2A03A`, 해저드 `#C9A227`.
+- 디자인: 목업의 **시안 캡슐 반응로**(어두운 금속 하우징, 양옆 장갑판, 노랑 해저드 줄무늬 받침)를 기본으로 하고, 기존 코어의 녹색/시안/빨강 버튼 3개를 받침 앞면에 남긴다(디렉터 질문 7).
+- **A3-G 발광(별도):** `LastStop_Core_TopDown_Glow_v1.png`, **192x96 x 4프레임 = 768x96**, 바닥 동심원 링(목업의 시안 원), 피벗 (0.5, 0.5), 색 `#127C8C` `#2EC4D6` `#7EF2F5` 3색만, 외곽선 없음. 가산 혼합 또는 낮은 알파로 쓰는 것은 Development 결정. LowHP 변형 1줄(빨강) 추가 가능.
+
+### A4. 내부 타일·소품 [잠정 — 전체가 Planning 레이아웃 의존]
+
+목업처럼 지붕을 걷어낸 3/4 탑다운. 위쪽 벽은 안쪽 면, 아래쪽 벽은 윗면 가장자리만 보인다. 기본 단위 **48x48 px = 1 wu**.
+
+**A4-T 타일셋** `Assets/Art/Interior/LastStop_Interior_TopDown_Tiles_v1.png`, 셀 48x48, 8열 x 8행 = **384x384**, 피벗 (0.5, 0.5), Tilemap/Rule Tile 용도, 크로마 불필요(불투명). 색 상한 32색.
+
+| 행 | 내용 |
+|---|---|
+| 0 | 바닥 기본 4종(미세 변형), 바닥 이음매 2종, 배수 그레이트 1, 빈칸 1 |
+| 1 | 노란 바닥 안내선(직선 가로/세로, 모서리 4) |
+| 2 | 위쪽 벽 안쪽 면 하단(창문 아래 패널) 4종 |
+| 3 | 위쪽 벽 안쪽 면 상단(창문 + 밖의 앰버 빛 반사) 2종, 천장등 붙은 창 2종 |
+| 4 | 아래쪽 벽 윗면 가장자리(높이 48 중 아래 16 px만 선체, 나머지 투명) 4종 |
+| 5 | 앞·뒤 끝 모서리(둥근 선체) 4종 |
+| 6 | 문턱(해저드 줄무늬) 2종, 계단 2종 [잠정] |
+| 7 | 예비 |
+
+**A4-P 소품** `Assets/Art/Interior/LastStop_Interior_TopDown_Props_v1.png`, 마젠타 크로마, 색 상한 32색, 모든 소품 피벗은 바닥 접점 중앙(y-정렬용).
+
+| 슬라이스 | 셀 | 프레임 | 피벗 | 비고 |
+|---|---|---|---|---|
+| `Prop_SeatPair_FacingDown` | 96x80 | 1 | (0.5, 0.1) | 위쪽 줄 좌석(쿠션과 등받이 앞면이 보임) |
+| `Prop_SeatPair_FacingUp` | 96x80 | 1 | (0.5, 0.1) | 아래쪽 줄 좌석(등받이 뒷면이 보임) |
+| `Prop_Seat_Single` | 48x80 | 1 | (0.5, 0.1) | 끝자리 |
+| `Prop_Pole` | 16x112 | 1 | (0.5, 0.05) | 노란 수직 기둥, 캐릭터와 겹칠 때 y-정렬 |
+| `Prop_Strap` | 16x32 | 2 | (0.5, 1.0) | 천장 손잡이, 흔들림 2프레임 |
+| `Prop_Door` [잠정] | 96x160 | 4 | (0.5, 0.05) | 닫힘, 열림 1–2, 열림+앰버 조명. **봉인 판자·자물쇠 없음** |
+| `Prop_DriverCab` [잠정] | 160x240 | 1 | (0.5, 0.05) | 운전석, 계기판, 핸들 |
+| `Decal_Blood` | 32x32 | 3 | (0.5, 0.5) | 바닥 데칼, 정렬 맨 아래 |
+| `Decal_Paper` | 32x32 | 3 | (0.5, 0.5) | 신문지·영수증 |
+
+시트 크기는 소품을 셀 높이 기준 행으로 묶어 1024x512 안에 배치하고, 실제 좌표는 납품 시 슬라이스 표로 함께 준다(크기가 섞여 Grid 자동 슬라이스 불가 → 수동 슬라이스).
+
+### A5. 외부 버스 탑다운
+
+| 항목 | 값 |
+|---|---|
+| 파일 | `Assets/Resources/Art/LastStop_BusBody_v2.png`, `Assets/Resources/Art/LastStop_BusWheels_v2.png` (코드가 이미 찾는 이름. 위치는 Development가 확정) |
+| 셀 | **320x144 px** (body와 wheels 모든 슬라이스 동일 — 코드 계약) |
+| 크기 | 차체 약 304x128: 지붕 304x80 + 화면 아래쪽 옆면 띠 약 40 px(창문, 문, 바퀴 아치). 6.67 x 3.0 wu |
+| 방향 | **앞이 오른쪽**(현재 외부 진행 방향). 1방향 |
+| 피벗 | 차체 바닥면 중앙 **(160, 72) → (0.5, 0.5)** (지붕 중심. 충돌 중심과 맞추기 쉬움) |
+| 슬라이스 | Body 파일: `Bus_Body_NoWheels` 1장. Wheels 파일: `Bus_Wheels_0` … `Bus_Wheels_3` 4장(1x4 = 1280x144), 바퀴 외 투명 |
+| 색 상한 | 32색 + 외곽선 |
+
+- 지붕: 기존 버스 노랑을 마스터 팔레트에 맞춘 램프 `#7A5418` `#B98320` `#E8B230` `#F6D365`(기존 버스 정체성 유지). 에어컨 박스, 비상 해치, **지붕 무기 장착점**(A6 피벗이 올 곳, 지붕 중앙에서 앞쪽으로 약 40 px)을 표시해 둔다. 장착점 좌표는 납품 데이터로 준다.
+- 옆면 띠: 앰버로 빛나는 창문 열, 문 1–2개, 바퀴 아치(바퀴 레이어가 보이도록 비워 둠). 앞 전조등, 뒤 빨간 후미등 `#E03A3A`.
+- 바퀴: 2개(앞, 뒤)만 옆면 띠 아래로 보인다. 4프레임 회전(휠 캡 무늬 45°씩).
+- 코드 연동(Development): `CreateBlock`이 버스를 4.8x1.8 wu로 강제하므로(`:344`) 스케일 1 배치로 바꿔야 한다. 피격 빨강 틴트는 코드 그대로.
+- 전조등 빛(선택): `LastStop_Bus_TopDown_Headlight_v1.png` 192x96 1장, 외곽선 없음, 앰버 3색.
+- 목업의 남색 선체를 외부에도 쓸지는 디렉터 질문 2.
+
+### A6. 지붕 무기 (콩알포, 8방향) + 포구 섬광
+
+탑다운에서 포탑은 지붕 위에서 내려다보이므로 포신이 지붕 평면에 눕는다. 이전 BLOCKED 원인(측면 3/4의 위/아래 원근 단축)이 크게 줄어든다.
+
+| 항목 | 값 |
+|---|---|
+| 파일 | `Assets/Art/Vehicles/Weapons/LastStop_RoofWeapon_Bean_TopDown_Sheet_v1.png` |
+| 셀 | **48x48 px** |
+| 방향 | 8방향: R, UR, U, DR, D 5행을 그림 + L, UL, DL은 flipX |
+| 프레임 | 3열(Idle, Recoil — 포신 2 px 후퇴, Settle) |
+| 시트 크기 | 3열 x 5행 = **144x240** |
+| 피벗 | 회전축 = 장착점 **(24, 24) → (0.5, 0.5)** |
+| 크기 | 돔 지름 약 20 px, 포신 피벗에서 끝까지 18 px |
+| 슬라이스 접두어 | `RoofBean` (예: `RoofBean_UR_01`) |
+| 색 상한 | 14색 + 외곽선 |
+
+**포구 좌표 (필수 납품 데이터).** 셀 왼쪽 아래 (0,0) 기준. 포신 끝 개구부 중앙이 이 점에서 1 px 이내. 3프레임 모두 Idle 값을 쓴다.
+
+| 방향 | 포구 점 (px) | 피벗 기준 (px) | world 오프셋 (PPU 48) |
+|---|---|---|---|
+| R | (42, 24) | (+18, 0) | (+0.375, 0) |
+| UR | (37, 37) | (+13, +13) | (+0.271, +0.271) |
+| U | (24, 42) | (0, +18) | (0, +0.375) |
+| DR | (37, 11) | (+13, −13) | (+0.271, −0.271) |
+| D | (24, 6) | (0, −18) | (0, −0.375) |
+| L (flip R) | (6, 24) | (−18, 0) | (−0.375, 0) |
+| UL (flip UR) | (11, 37) | (−13, +13) | (−0.271, +0.271) |
+| DL (flip DR) | (11, 11) | (−13, −13) | (−0.271, −0.271) |
+
+- 가독성 규칙: 포신은 가장 밝은 금속색 `#D5DBEA`, 돔은 버스 노랑, 포신 끝 2 px은 밝은 링 `#F6D365` + 구멍 `#07080F`. 네 방향 모두 포신 길이는 같다(원근 단축 금지). U 방향은 포신이 돔 뒤(위)로, D 방향은 돔 앞(아래)으로 그려 겹침 순서를 맞춘다.
+- 8방향 사이 조준은 가장 가까운 방향 스프라이트를 쓴다(회전 금지, 2.5절). 더 부드럽게 하려면 16방향(9장 그림)으로 확장 가능 — 디렉터 질문 1.
+- **포구 섬광:** `LastStop_RoofWeapon_Bean_MuzzleFlash_v1.png`, **24x24 x 3프레임 = 72x24**, 오른쪽 향함, 피벗 **(0, 0.5)**(왼쪽 가장자리 중앙 = 포구 점), 30 fps. 코드 회전 허용(2.5절 VFX 예외). 반짝이 별이 아니라 **포신 방향 원뿔**.
+- 검수용 가이드(임포트 금지): 각 셀 포구 점을 `#FF00FF` 1 px로 찍은 `..._MuzzleGuide_v1.png`, Art 작업 폴더에 보관. 위 표가 정본.
+- 팔레트: 버스 노랑 `#7A5418` `#B98320` `#E8B230`, 금속 `#2A3563` `#3C4163` `#5A6390` `#9AA3C0` `#D5DBEA`, 링 `#F6D365`, 구멍 `#07080F`, 콩알 `#C9D94A`.
+- 비눗방울 발사기, 화염 꼬치 등 다른 무기도 같은 48x48 셀·피벗·포구 표 형식을 쓰면 장착점을 공유할 수 있다(디렉터 질문 10).
+
+### A2-E. 외부 적 (작은 변형) — P3, 디렉터 질문 3 결과에 따름
+
+- `Assets/Art/Characters/Enemies/LastStop_Rusher_TopDown_Exterior_Sheet_v1.png`, 셀 **64x64**, 키 약 40 px, 피벗 (32, 8) → (0.5, 0.125).
+- 4방향(D, U, R + flip) Walk 4프레임 + Death(D) 4프레임 = 4열 x 4행 = 256x256. 색 상한 12색. 같은 디자인을 단순화(꼬리와 눈만 강조).
+- 외부 적이 버스에 닿아 내부로 들어가면 내부 표시는 A2를 쓴다(1:1 침입 규칙은 그대로, 그림만 다름).
+
+### SH. 공용 바닥 그림자
+
+- `Assets/Art/Common/LastStop_Shadow_TopDown_v1.png`, 3장: 48x16(적), 64x20(플레이어), 112x28(코어). 단색 `#07080F`, 알파 0/255, 피벗 (0.5, 0.5). 반투명은 SpriteRenderer 색 알파(예: 0.45)로 Development가 처리.
 
 ---
 
-## 4. 이미지 생성 프롬프트 (ChatGPT 이미지 생성용, 영어 그대로 붙여넣기)
+## 6. 이미지 생성 프롬프트 (ChatGPT 이미지 생성, 영어 그대로 붙여넣기)
 
-### 4.0 사용 원칙
+### 6.0 사용 원칙
 
-- 생성 모델은 정확한 픽셀 그리드와 균일한 셀을 보장하지 못한다. **애니메이션 1행씩 따로 생성**하고, 기존 스프라이트를 참조 이미지로 첨부한다(A1: `Player_Interior_SideView` 영역 잘라낸 것, A2: `Enemy_Interior_SideView`, A4: `LastStop_InteriorCore_v1.png`).
-- 결과는 "컨셉 겸 밑그림"이다. 납품 전에 4.5절 후처리와 사람의 픽셀 수정(Aseprite 등)이 필요하다. 후처리 없이 임포트하지 않는다.
-- 프롬프트 안의 `{...}` 부분만 행별로 바꾼다.
+- 매번 **6.1 공통 스타일 블록 + 에셋 블록**을 이어 붙인다. `{...}`만 바꾼다.
+- 첨부: 승인 목업 A(스타일) + 해당 대상의 승인 모델 시트(없으면 6.2의 모델 시트부터). 플레이어·적 모델 시트의 1차 참조로 기존 `LastStop_MvpSpritesheet_v1.png`의 `Player_Exterior_TopDown`, `Enemy_Exterior_TopDown` 영역을 잘라 첨부한다.
+- 캔버스는 가로형 1536x1024 권장. 6프레임 x 128 셀이면 가짜 픽셀 약 2 px라 후처리가 쉽다.
+- 결과는 밑그림이다. 7절 후처리와 사람 수정 없이 임포트하지 않는다.
 
-### 4.1 A1 내부 플레이어 (행별 생성)
-
-```
-Pixel art sprite sheet, single horizontal row of {6} equal-size frames, side view, character facing right.
-Character: a young female bus guard in a chibi-proportioned but readable style (about 3 heads tall), brown hair in a messy bun, orange-red puffy winter jacket with a cream fur collar, dark navy pants, brown boots, olive green backpack with a bedroll, holding a wooden spiked club in both hands. Match the attached reference character exactly in design and colors.
-Animation: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4}.
-Strict rules: true low-resolution pixel art drawn on a 96x64 pixel grid per frame, then shown enlarged with nearest-neighbor so every art pixel is a crisp square block of identical size. Each frame cell is the same size, character is the same height in every frame (about 48 art pixels tall), feet on the same baseline at the bottom of each cell, body centered at the same x position in every cell, extra empty space in front of the character for the club swing.
-1-pixel dark outline (#141019) around the whole silhouette, no anti-aliasing, no soft shading, no gradients, no glow, no motion blur, no smear trails, no drop shadow, no text, no frame borders, no grid lines.
-Limited palette of at most 20 colors. Light comes from the upper left.
-Background: perfectly flat solid magenta #FF00FF filling the entire image, no texture, no vignette.
-```
-
-행별 `{Animation}` 대체 문구:
-- Idle: `idle breathing, 4 frames, looping, club held low, chest rises by 1 pixel`
-- AttackA: `first combo strike, 3 frames: frame 1 the club already hitting forward horizontally at full extension (contact, no wind-up), frame 2 follow-through past the body, frame 3 recovering to guard`
-- AttackB: `second combo strike, 3 frames: frame 1 rising upward swing at contact, frame 2 follow-through above the head, frame 3 recovering`
-- AttackC: `third finishing strike, 4 frames: frame 1 overhead club slamming down in front at contact, frame 2 impact pose crouched low with the club touching the floor, frame 3 follow-through, frame 4 recovering. Biggest and most dynamic silhouette of the set`
-- Hurt: `hurt reaction, 2 frames, leaning backward, eyes squeezed shut`
-
-(Idle 4프레임, Attack 3–4프레임일 때는 첫 줄의 `{6}`도 같은 수로 바꾼다.)
-
-### 4.2 A2 내부 적 Rusher (행별 생성)
+### 6.1 공통 스타일 블록 (모든 프롬프트 맨 앞)
 
 ```
-Pixel art sprite sheet, single horizontal row of {6} equal-size frames, side view, creature facing right.
-Creature: a feral skunk-like night critter, dark purple fur, large bushy tail with pale pink stripes, glowing yellow eyes, small sharp claws, aggressive low stance. Match the attached reference creature in design and colors.
-Animation: {running cycle, 6 frames, looping, tail bouncing}.
-Strict rules: true low-resolution pixel art drawn on an 80x48 pixel grid per frame, shown enlarged with nearest-neighbor so every art pixel is a crisp square block of identical size. Every frame cell is the same size, the creature is about 30 art pixels tall and about 44 art pixels long including the tail, paws on the same baseline at the bottom of each cell, body at the same x position in every cell, empty space in front for lunging.
-Simple bold silhouette that stays readable when 50 copies overlap. A thin lighter purple rim light on the top edge of the body. 1-pixel dark outline (#141019), no anti-aliasing, no gradients, no glow halo, no motion blur, no drop shadow, no text, no frame borders.
-Limited palette of at most 14 colors. Light from the upper left.
-Background: perfectly flat solid pure green #00FF00 filling the entire image, no texture.
+STYLE: high-resolution pixel art for a 2D top-down survival game, matching the attached style reference (a night bus interior seen from a 3/4 top-down camera, roof removed). Camera looks down at about 35 degrees, so characters are seen slightly from the front and their faces are visible. Grounded proportions, about 5.5 heads tall, not chibi.
+PIXEL RULES: true pixel art on an exact grid. Every art pixel is a crisp square block of identical size, enlarged with nearest-neighbor. No anti-aliasing on the outer silhouette, no blur, no soft brushes, no gradients, no bloom, no glow halo, no motion blur, no painterly texture, no photorealism.
+OUTLINE: 1-art-pixel near-black outline (#07080F) around every character and object silhouette. Interior lines use the darkest shade of the local color.
+LIGHT: night scene. Warm amber key light from above (top of the screen) on heads, shoulders and top surfaces; shadows hue-shifted toward dark blue-violet; a thin cool blue rim (#6E86B0) on the lower and back edges. Do not paint cyan or colored glow onto the character. 3 to 4 flat tones per material.
+PALETTE: dark navy and blue-violet environment (#0E162D, #21293B, #30436B, #405F82), amber lights (#C9781F, #FB9E3A, #FFC260, #FFE9A8), yellow handrails (#D9A521, #FBD631), cyan core energy (#127C8C, #2EC4D6, #7EF2F5, #D3FFFF), danger red (#7A1622, #C02A34, #E03A3A). Use a limited palette.
+SHEET RULES: equal-size frame cells in a strict grid, the subject the same size and at the same position in every cell, feet or base on the same baseline in every cell. No drop shadow, no floor, no text, no labels, no numbers, no frame borders, no grid lines.
+BACKGROUND: perfectly flat solid {#FF00FF magenta} filling the entire image, no texture, no vignette, no shadow on the background.
 ```
 
-행별 대체 문구:
-- Attack: `attack, 4 frames: frame 1 crouching and coiling, frame 2 lunging forward, frame 3 biting and clawing at full extension (the hit frame), frame 4 landing back`
-- Hurt: `hurt, 2 frames, knocked backward, eyes shut`
-- Death: `death, 5 frames: flinch, collapse, puff into dark purple smoke, smoke thinning, only two or three small smoke specks left`
-- Breach: `entering, 3 frames: leaping in from the left mid-air, landing crouched, standing ready`
+(기본 적 Rusher는 `{#FF00FF magenta}` → `#00FF00 pure green`.)
 
-### 4.3 A3 루프 무기 콩알포 (방향별 생성 권장, 4방향 한 장도 가능)
+### 6.2 모델 시트 (애니메이션 전에 1회, 대상별)
 
 ```
-Pixel art sprite sheet for a small roof-mounted cannon turret on a yellow city bus, viewed from a 3/4 top-down angle matching a side-scrolling 2D game. Grid of 3 columns by 4 rows, every cell the same size, 32x32 art pixels per cell, shown enlarged with nearest-neighbor so each art pixel is a crisp square block.
-Rows from top to bottom: barrel aiming RIGHT, barrel aiming LEFT, barrel aiming UP (toward the top of the screen), barrel aiming DOWN (toward the bottom of the screen, toward the viewer).
-Columns from left to right: idle, recoil (barrel pulled back 2 pixels), settling.
-Turret design: a rounded yellow dome (#E8B230) on a short dark metal ring mount, with one long bright steel barrel. The mount center is exactly at the center of every cell. The barrel is long and clearly visible in all four directions, about 13 pixels from the mount center to the tip, never shortened by perspective. The barrel tip has a bright yellow ring and a dark round bore hole.
-For the DOWN row the barrel extends downward in front of the dome and the dark bore hole with a bright ring is clearly visible at the bottom tip. For the UP row the barrel extends upward behind the dome.
-The barrel tip must touch: right edge center-right for RIGHT, left edge for LEFT, top edge center for UP, bottom edge center for DOWN.
-Strict rules: 1-pixel dark outline (#141019), no anti-aliasing, no gradients, no glow, no muzzle flash, no projectile, no text, no grid lines, no drop shadow. Limited palette of at most 12 colors, light from the upper left.
-Background: perfectly flat solid magenta #FF00FF.
+Create a character model sheet: the same character standing idle in 3 views side by side in equal cells: facing down toward the camera, facing up away from the camera, facing right. Each cell {128x128} art pixels, character about {80} art pixels tall, feet on the bottom baseline at the same height in every cell.
+CHARACTER: {character description from the asset block below}.
 ```
 
-포구 섬광(별도):
+### 6.3 A1 플레이어 (애니메이션 1행 x 1방향씩)
 
 ```
-Pixel art muzzle flash animation, single row of 3 equal frames, each 16x16 art pixels, shown enlarged with nearest-neighbor. The flash points to the RIGHT and starts exactly at the middle of the left edge of each cell: a short cone-shaped burst of yellow and white with a tiny round bean-shaped spark, frame 1 small and bright, frame 2 largest cone, frame 3 fading to two small sparks. Colors: #FFFFFF, #F6D365, #F2A03A, #C9D94A, 1-pixel outline only where needed. No anti-aliasing, no glow, no gradients, no star shapes. Background: perfectly flat solid magenta #FF00FF.
+SUBJECT: one horizontal row of {6} equal frames, each cell 128x128 art pixels, character about 80 art pixels tall, feet centered horizontally at the same point near the bottom of each cell with about 24 pixels of empty space below the feet and generous empty space around the body for the club swing.
+CHARACTER: a young female night bus guard, brown hair tied in a messy bun, red-orange puffy winter jacket (#B8581C, #E07A26, #F6B04A) with a cream fur collar, dark navy pants, brown boots, olive green backpack with a rolled bedroll, holding a wooden club studded with nails. Identical design, proportions and colors to the attached model sheet.
+DIRECTION: facing {down toward the camera}.
+ANIMATION: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4, body bobs by 1 pixel}.
 ```
 
-### 4.4 A4 내부 코어 (상태별 생성)
+`{ANIMATION}` 대체 문구:
+- Idle: `idle breathing, 4 frames, looping, club resting on the shoulder, chest rises by 1 pixel` (`{6}` → `4`)
+- AttackA: `first combo strike, 3 frames: frame 1 the club already hitting in front of the character at full extension (contact, no wind-up), frame 2 follow-through across the body, frame 3 recovering to guard. Club stays fully visible, no smear trail` (`{6}` → `3`)
+- AttackB: `second combo strike, 3 frames, backhand swing in the opposite direction: frame 1 contact, frame 2 follow-through, frame 3 recover` (`{6}` → `3`)
+- AttackC: `third finishing strike, 4 frames: frame 1 overhead club slamming down in front at contact, frame 2 crouched impact pose with the club touching the floor, frame 3 follow-through, frame 4 recovering. Biggest silhouette of the set` (`{6}` → `4`)
+- Hurt: `hurt reaction, 2 frames, leaning back away from the facing direction, eyes squeezed shut` (`{6}` → `2`)
+
+`{DIRECTION}` 대체: `down toward the camera` / `up away from the camera, back of the head and backpack visible` / `right, three-quarter side view`.
+
+### 6.4 A2 기본 적 Rusher
 
 ```
-Pixel art sprite sheet, single horizontal row of {4} equal-size frames, front-facing slightly from the side, a compact sci-fi power core terminal standing on a bus floor. Match the attached reference machine: dark navy metal housing, a large cyan screen showing a simple bus icon and a waveform line, three square buttons (green, cyan, red) below the screen, one amber indicator light, yellow hazard stripes at the base.
-State: {normal idle, 4 frames, looping, the waveform shifts by 2 pixels each frame and the green button blinks}.
-Strict rules: true low-resolution pixel art on a 56x64 pixel grid per frame, the machine about 44 pixels wide and 54 pixels tall, standing on the bottom edge of each cell, same position in every frame, shown enlarged with nearest-neighbor so every art pixel is a crisp square block. Very simple shapes, no tiny bolts or vents, a lighter blue-gray rim light on the top and left edges so it separates from a dark wall. 1-pixel dark outline (#141019), no anti-aliasing, no gradients, no glow halo, no drop shadow, no text, no frame borders.
-Limited palette of at most 16 colors. Light from the upper left.
-Background: perfectly flat solid magenta #FF00FF.
+SUBJECT: one horizontal row of {6} equal frames, each cell 96x96 art pixels, creature about 64 art pixels tall at the head and about 70 pixels long including the tail, paws on the same baseline near the bottom of each cell with about 12 pixels below, body at the same position in every cell.
+CHARACTER: a feral skunk-like night critter, dark purple fur (#4B293D, #703950, #834859) with a lighter purple rim on top (#A7678A), huge bushy tail with pale pink stripes (#D99688, #FBC9B3), glowing yellow eyes (#FFD23A), red mouth, small cream claws. Aggressive low stance. Simple bold silhouette that stays readable when fifty copies overlap. Identical design to the attached model sheet.
+DIRECTION: facing {down toward the camera}.
+ANIMATION: {running cycle, 6 frames, looping, tail bouncing}.
 ```
 
-상태별 대체 문구:
-- LowHP: `critical damage, 4 frames, looping, the screen is red with a warning symbol blinking, one crack across the screen, amber light flashing`
-- Hit: `taking a hit, 2 frames: frame 1 screen flashes white and the body is squashed down by 1 pixel, frame 2 returning to normal`
-- Destroyed: `destroyed, 1 frame, screen shattered and dark, housing dented, no fire` (`{4}` → `1`)
+대체 문구:
+- Attack: `attack, 4 frames: frame 1 crouching and coiling, frame 2 lunging forward, frame 3 biting and clawing at full extension (hit frame), frame 4 landing back` (`{6}` → `4`)
+- Hit: `hit reaction, 2 frames, knocked backward, eyes shut` (`{6}` → `2`)
+- Death (D만): `death, 6 frames: flinch, collapse, body dissolving into dark purple smoke, smoke spreading, smoke thinning, only two or three small smoke specks left`
+- Breach (D만) [잠정]: `entering through a doorway, 3 frames: leaping in mid-air, landing crouched, standing ready` (`{6}` → `3`)
 
-### 4.5 후처리 (모든 에셋 공통)
+대안(좀비 디자인 채택 시) CHARACTER 줄: `a shambling zombie bus passenger, grey-green skin (#5E6B4A, #8A9670), torn shirt (#6A607E, #BEB7D3) stained with red, hunched posture, arms reaching forward, pale yellow eyes. About 72 art pixels tall.` + 배경 마젠타.
 
-1. **크로마 제거**: 배경색(`#FF00FF` 또는 `#00FF00`)과 RGB 거리 80 이내인 픽셀을 alpha 0으로 만든다. 경계에 남은 분홍/초록 띠는 1px 침식하거나 수작업으로 지운다.
-2. **유효 픽셀 크기 확인**: 생성 이미지의 "가짜 픽셀" 한 칸 크기를 잰다(예: 1536 px 폭에 6프레임 x 96 → 칸당 약 2.67 px). 셀 경계를 직접 측정해 프레임별로 잘라낸다. 생성기가 셀 간격을 지키지 않는 경우가 많으므로 균등 분할을 가정하지 않는다.
-3. **최근접 축소**: 각 프레임을 목표 셀 크기(A1 96x64, A2 80x48, A3 32x32, 섬광 16x16, A4 56x64)로 **Nearest Neighbor**로 축소한다. 가짜 픽셀 블록의 중앙을 샘플링하도록 오프셋을 반 칸 둔다.
-4. **팔레트 축소**: 항목별 최대 색 수로 줄인다(디더링 없음). 3절 지정 팔레트로 매핑(가장 가까운 색)하는 것을 권장한다.
-5. **알파 이진화**: alpha < 128 → 0, 나머지 → 255. 외곽에 `#141019` 1px 외곽선이 끊긴 곳을 보정한다.
-6. **정렬**: 발 기준선을 y=0에 맞추고, 피벗 x 열에 몸통 중심을 맞춘다. 프레임 사이 기준선 차이 0px, 몸통 x 차이 ±1px 이내.
-7. **사람 수정**: 얼굴, 손, 포신 끝, 포구 링은 반드시 손으로 정리한다. A3은 포구 좌표표와 1px 이내인지 가이드 PNG로 확인한다.
-8. **시트 조립**: 3절 셀 크기 x 행/열 순서로 여백 없이 붙인다(Offset 0, Padding 0).
-9. **Unity 슬라이스**: Sprite Editor → Slice → Grid By Cell Size, 셀 크기 입력, Pivot Custom(3절 값) → 슬라이스 이름을 2.3절 규칙으로 바꾸고 빈 셀은 삭제한다.
+### 6.5 A3 코어
 
-참고용 Pillow 스크립트(검증하지 않음, Art 작업 폴더에서 사용):
+```
+SUBJECT: one horizontal row of {6} equal frames, each cell 128x128 art pixels, a single machine about 96 pixels wide and 104 pixels tall standing on the bottom of each cell, same position in every frame, seen from the same 3/4 top-down camera, front face visible.
+OBJECT: a compact power core reactor in the middle of a bus: a vertical glass capsule filled with glowing cyan energy (#2EC4D6, #7EF2F5, #D3FFFF) held by dark gunmetal armored housing (#182C3C, #2A3563, #3C4163, #5A6390) with side armor plates, a low base with yellow and black hazard stripes, three small square buttons on the front of the base (green, cyan, red) and one amber indicator light. Simple large shapes, no tiny bolts. The capsule is the brightest element; light inside the capsule only, no glow outside the outline.
+STATE: {idle, 6 frames, looping, energy level in the capsule rises and falls by 1 to 2 pixels, base lamp blinks}.
+```
+
+대체 문구:
+- Hit: `taking a hit, 3 frames: frame 1 capsule flashes white and the machine is squashed down by 1 pixel, frame 2 normal colors with a small crack flicker, frame 3 back to normal` (`{6}` → `3`)
+- LowHP: `critical damage, 6 frames, looping, capsule light alternates between cyan and red (#E03A3A), one crack across the glass, amber warning lamp flashing`
+- Destroyed: `destroyed, 1 frame, capsule glass shattered and dark, housing dented, no fire, no smoke` (`{6}` → `1`)
+
+A3-G 발광:
+```
+SUBJECT: one horizontal row of 4 equal frames, each cell 192x96 art pixels, flat concentric elliptical rings on the floor seen from a 3/4 top-down camera, centered in each cell, made of only three colors (#127C8C, #2EC4D6, #7EF2F5), thin 1 to 2 pixel ring lines and a few broken arc segments, rings slowly expanding outward across the 4 frames. No outline, no solid fill, no blur.
+```
+
+### 6.6 A4 내부 타일·소품 [잠정]
+
+타일셋 (크로마 대신 불투명 타일이므로 BACKGROUND 줄을 `BACKGROUND: none, tiles fill their cells completely.`로 바꾼다):
+```
+SUBJECT: a tileset grid of 8 columns by 8 rows, every tile exactly 48x48 art pixels, seamless edges, for the floor and walls of a city bus interior seen from a 3/4 top-down camera with the roof removed. No outlines on tiles.
+ROW CONTENT: row 1 dark blue-violet anti-slip floor (#1D1E32, #2F314C, #414465) in 4 subtle variations, 2 seam tiles, 1 drain grate; row 2 yellow floor guide line pieces (straight and corners, #D9A521); row 3 lower panels of the far wall's inner face; row 4 the far wall's windows showing amber city light reflections (#FB9E3A, #FFC260) and two with a warm ceiling lamp; row 5 the near wall's top rim seen from above (dark navy hull #1E2447, #35427B, only the bottom 16 pixels filled, rest flat magenta); row 6 rounded front and rear corner pieces; row 7 a hazard-striped door threshold and step; row 8 empty magenta.
+```
+
+소품 (1회에 같은 크기 소품만):
+```
+SUBJECT: one row of {4} equal cells, each {96x80} art pixels, {pairs of bus seats facing down toward the camera so the seat cushions and the front of the backrests are visible}, standing on the bottom edge of each cell.
+OBJECT DETAILS: navy blue fabric seats (#1A2C5B, #25305A, #3A4C8C) with a small orange dot pattern (#E07A3A), dark metal frames, a yellow grab handle on top of the backrest (#FBD631). Slight wear variations between cells.
+```
+`{OBJECT}` 대체: `pairs of bus seats seen from behind, backrests facing the camera` / `a single vertical yellow handrail pole (16x112 cells)` / `a bus side door, closed, half open, fully open, fully open with warm amber light spilling onto the floor; no boards, no locks, no barricades (96x160 cells)` / `small floor decals: three blood splatters (#7A1622, #C02A34) and three crumpled newspapers (32x32 cells)`.
+
+### 6.7 A5 외부 버스 탑다운
+
+```
+SUBJECT: a single city bus seen from a 3/4 top-down camera at night, driving to the RIGHT. Canvas cell 320x144 art pixels, bus body about 304 pixels long, centered. Mostly the roof is visible (about 80 pixels tall) plus a thin strip of the near (bottom) side about 40 pixels tall showing a row of amber-lit windows, one or two doors and two empty wheel arches.
+DETAILS: yellow roof (#7A5418, #B98320, #E8B230, #F6D365) with an air-conditioning unit and an emergency hatch, a small round empty turret mount ring on the roof slightly toward the front, headlights at the right end, red tail lights (#E03A3A) at the left end, dark windshield at the right end. NO wheels drawn (leave the wheel arches dark and empty).
+```
+
+바퀴(별도 생성 후 같은 셀에 맞춰 배치):
+```
+SUBJECT: one row of 4 equal frames, each 320x144 art pixels, showing ONLY two dark bus wheels with grey hubcaps at the bottom edge positions matching the attached bus (front wheel near the right, rear wheel near the left), everything else flat magenta. Each frame rotates the hubcap pattern by 45 degrees.
+```
+
+### 6.8 A6 지붕 무기 콩알포 (방향 1행씩)
+
+```
+SUBJECT: one row of 3 equal frames, each cell 48x48 art pixels, a small roof-mounted cannon turret seen from directly above at a slight 3/4 angle. The rotation center (a round yellow dome about 20 pixels wide, #B98320, #E8B230, on a dark metal ring) is exactly at the center of every cell. One long bright steel barrel (#9AA3C0, #D5DBEA) points {RIGHT}, 18 pixels from the center to the tip, never shortened by perspective. The barrel tip has a bright yellow ring (#F6D365) around a dark bore hole (#07080F).
+FRAMES: idle, recoil (barrel pulled back toward the dome by 2 pixels), settling.
+LAYERING: {for UP the barrel goes behind the dome; for DOWN the barrel lies in front of the dome}.
+NO muzzle flash, no projectile.
+```
+`{RIGHT}` 대체: `RIGHT` / `diagonally UP-RIGHT at 45 degrees` / `UP toward the top of the screen` / `diagonally DOWN-RIGHT at 45 degrees` / `DOWN toward the bottom of the screen`.
+
+포구 섬광:
+```
+SUBJECT: one row of 3 equal frames, each 24x24 art pixels. A muzzle flash pointing RIGHT that starts exactly at the middle of the left edge of each cell: a short cone-shaped burst of white and yellow with a tiny round bean-shaped spark. Frame 1 small and bright, frame 2 largest cone, frame 3 fading to two small sparks. Colors only #FFFFFF, #F6D365, #FB9E3A, #C9D94A. No outline, no star shapes, no glow.
+```
+
+---
+
+## 7. 후처리 파이프라인 (모든 에셋 공통)
+
+1. **크로마 제거:** 배경색과 RGB 맨해튼 거리 90 이내 → alpha 0. 경계에 남은 분홍/초록 띠는 1 px 침식 또는 수작업.
+2. **가짜 픽셀 크기 측정:** 생성 이미지에서 외곽선 두께나 평탄 영역 블록 크기로 한 칸 크기(예: 2.0, 2.67 px)를 잰다. 균등 분할을 가정하지 않는다.
+3. **프레임 잘라내기:** 크로마 제거 후 연결 영역(bounding box)으로 프레임을 찾는다. 생성기는 셀 간격을 자주 어긴다.
+4. **최근접 축소:** 각 프레임을 목표 셀 크기의 아트 해상도로 Nearest Neighbor 축소(블록 중앙 샘플링, 반 칸 오프셋).
+5. **팔레트 매핑:** 2.2절 마스터 팔레트(+캐릭터 램프)에서 에셋별 상한 이하로 가장 가까운 색 매핑, 디더링 없음.
+6. **알파 이진화:** alpha < 128 → 0, 나머지 255.
+7. **외곽선 보정:** 실루엣 바깥 1 px 외곽선 `#07080F` 끊긴 곳을 채운다(스크립트로 자동 추가 후 사람 확인).
+8. **정렬:** 발/바닥 기준선을 피벗 y에, 몸통 중심을 피벗 x에 맞춘다. 같은 행 프레임 사이 기준선 차이 0 px, 몸통 x ±1 px.
+9. **사람 수정(Aseprite):** 얼굴, 눈, 손, 곤봉 못, 포신 끝, 포구 링, 좌우 반전 시 어색한 부분. A6은 가이드 PNG로 포구 좌표 1 px 이내 확인.
+10. **시트 조립:** 5절 셀 크기와 행 순서로 여백 없이 붙인다.
+11. **자동 검증:** 시트 크기, alpha ∈ {0,255}, 색 수, 크로마 잔여 0, 행별 기준선 일치.
+12. **Unity 임포트·슬라이스:** 4.3절 설정, Grid By Cell Size, Custom Pivot, 슬라이스 이름 규칙, 빈 셀 삭제.
+13. **화면 리뷰:** 960x540과 1920x1080 실제 플레이 캡처(Development/QA가 생성)로 8절 체크리스트.
+
+참고용 Pillow 스크립트(실행 검증하지 않음, Art 작업 폴더에서 사용):
 
 ```python
 from PIL import Image
 
-def clean_frame(src, box, cell, palette_png, chroma=(255, 0, 255), tol=80):
-    """box: 생성 이미지에서 잘라낼 프레임 영역, cell: (w, h) 목표 셀 크기"""
+def clean_frame(src, box, cell, palette_png, chroma=(255, 0, 255), tol=90):
+    """box: 생성 이미지에서 잘라낼 프레임 영역, cell: (w, h) 목표 아트 px 크기,
+    palette_png: 2.2절 팔레트 색만 담은 작은 PNG"""
     im = Image.open(src).convert("RGBA").crop(box)
     px = im.load()
     for y in range(im.height):
@@ -302,66 +554,90 @@ def clean_frame(src, box, cell, palette_png, chroma=(255, 0, 255), tol=80):
                 px[x, y] = (0, 0, 0, 0)
     small = im.resize(cell, Image.NEAREST)
     alpha = small.getchannel("A").point(lambda v: 255 if v >= 128 else 0)
-    pal = Image.open(palette_png).convert("P")  # 지정 팔레트를 담은 작은 PNG
+    pal = Image.open(palette_png).convert("P")
     rgb = small.convert("RGB").quantize(palette=pal, dither=Image.Dither.NONE).convert("RGBA")
     rgb.putalpha(alpha)
     return rgb
+
+def validate_sheet(path, size, max_colors):
+    im = Image.open(path).convert("RGBA")
+    assert im.size == size, f"size {im.size} != {size}"
+    alphas = {a for *_, a in im.getdata()}
+    assert alphas <= {0, 255}, f"semi-transparent alpha: {sorted(alphas)[:10]}"
+    colors = {p[:3] for p in im.getdata() if p[3] == 255}
+    assert len(colors) <= max_colors + 1, f"{len(colors)} colors"
+    assert (255, 0, 255) not in colors and (0, 255, 0) not in colors, "chroma left"
 ```
 
 ---
 
-## 5. 960x540 아트 리뷰 수락 체크리스트
+## 8. 리뷰 체크리스트
 
-리뷰 조건: Game view 960x540 고정, 실제 플레이 화면 캡처(정지 이미지와 실시간 영상)를 쓴다. Art 혼자서는 Unity를 실행하지 않으므로 캡처는 Development/QA가 만들고, 통과 여부는 디렉터가 판정한다.
+리뷰 조건: 960x540(1x)과 1920x1080(2x) 실제 플레이 캡처(정지와 실시간 영상). Art는 Unity를 실행하지 않으므로 캡처는 Development/QA가 만들고 통과 여부는 디렉터가 판정한다.
 
 **파일과 임포트**
-- [ ] 파일 크기가 3절 시트 크기와 정확히 같다(576x384, 480x240, 96x128, 48x16, 224x256).
-- [ ] alpha 값은 0과 255만 있다(스크립트로 히스토그램 확인).
-- [ ] 색 수가 항목별 상한 이하이다(외곽선 포함 +1).
-- [ ] `.meta`: `filterMode: 0`, 모든 플랫폼 `textureCompression: 0`, `spritePixelsToUnits: 24`(또는 합의값), mipmap off, 자동 잔여 슬라이스 없음.
-- [ ] 슬라이스 이름과 피벗이 3절과 같다. 기존 파일과 기존 `.meta` GUID는 변경하지 않았다.
-- [ ] 봉인(자물쇠, 판자 등) 모티프가 없다.
+- [ ] 시트 크기가 5절과 같다(768x2304, 576x1056, 768x512, 768x96, 384x384, 144x240, 72x24, Bus body 320x144 / wheels 1280x144 등).
+- [ ] alpha는 0과 255만 있다(`validate_sheet`).
+- [ ] 색 수가 항목별 상한 이하이고 모든 색이 마스터 팔레트(+캐릭터 램프)에 있다.
+- [ ] `.meta`: `filterMode: 0`, **모든 플랫폼** `textureCompression: 0`, `spritePixelsToUnits: 48`(또는 합의값), mipmap off, 자동 잔여 슬라이스 없음.
+- [ ] 슬라이스 이름과 피벗이 5절과 같다. `Bus_Body_NoWheels`와 `Bus_Wheels_0..3`은 rect·pivot·PPU가 모두 같다.
+- [ ] 기존 파일과 기존 `.meta` GUID는 변경하지 않았다.
+- [ ] 봉인(판자, 자물쇠, 바리케이드) 모티프가 없다.
 
-**픽셀 품질 (캡처를 400% 확대해서 확인)**
-- [ ] 아트 1px가 모든 곳에서 화면 2x2 px이다(1px/3px 섞임 없음). 안 B 또는 A가 적용되지 않았다면 이 항목은 "보류"로 기록한다.
-- [ ] 배경 위에서 외곽선이 끊기거나 후광(분홍/초록 띠)이 없다.
+**스타일 일관성 (목업 A와 나란히 놓고)**
+- [ ] 밤 남색 환경 + 앰버 실내등 + 시안 코어 + 빨강 위험의 색 역할이 목업과 같다.
+- [ ] 외곽선이 1 아트 px `#07080F`이고 실루엣 바깥에 AA·후광이 없다.
+- [ ] 그라데이션·블룸·페인터리 질감이 없다(거절안 B 특징 없음).
+- [ ] 한 화면 안에서 픽셀 크기가 모두 같다(400% 확대 확인, 1080p에서 2x2 일정). Pixel Perfect Camera 미적용이면 "보류"로 기록.
+- [ ] 캐릭터 시점(위에서 약 35°, 얼굴 보임)이 플레이어·적·코어·소품에서 같다.
 
 **가독성 (100% 크기, 리뷰어 2명 이상이 설명 없이 판단)**
-- [ ] 내부 플레이어의 화면 키가 90–100 px이고, 노란 기둥 앞을 지날 때도 실루엣이 분리된다.
-- [ ] 걷기가 미끄러지지 않는다(발 접지 프레임과 이동 속도 5 wu/s가 맞는지 Dev와 확인).
-- [ ] 콤보 1·2·3타가 서로 다른 동작으로 보이고, 3타가 가장 크게 읽힌다. 입력 직후 첫 프레임에 이미 타격이 보인다.
-- [ ] 내부 적이 **측면 스프라이트**로 나오고 오른쪽(코어)을 본다. 화면 높이 약 60 px이고 플레이어와 바로 구분된다.
-- [ ] 적 공격의 hit 프레임이 실제 HP 감소 시점과 맞는다(±1프레임).
-- [ ] 50마리 경보 상황 캡처에서 플레이어와 코어의 위치를 2초 안에 찾을 수 있다.
-- [ ] 코어의 정상 / 저HP / 피격 상태가 색 틴트 없이도 구분된다.
-- [ ] 루프 무기: 4방향 각각의 조준 방향을 리뷰어가 설명 없이 맞힌다. **특히 D(아래)와 U(위)**.
-- [ ] 루프 무기: 포구 섬광과 탄환 생성 위치가 네 방향 모두 포신 끝에서 아트 1px 이내이다(포구 좌표표 기준, Dev 연동 후).
-- [ ] 버스 위에서 포탑이 버스 실루엣을 과하게 가리지 않는다(버스 높이의 절반 이하가 지붕 위로 나온다).
+- [ ] 플레이어 키 80 아트 px(1080p 160 px)이고 노란 기둥 앞, 좌석 사이에서도 실루엣이 분리된다.
+- [ ] 플레이어·적의 바라보는 방향(4 또는 8)을 리뷰어가 맞힌다. flipX한 L 방향이 어색하지 않다.
+- [ ] 걷기가 미끄러지지 않는다(접지 프레임과 이동 속도, Dev와 확인).
+- [ ] 곤봉 공격의 방향과 타격 순간이 첫 프레임에 보인다. 콤보를 만들면 3타가 가장 크다.
+- [ ] 적 공격의 hit 프레임이 실제 HP 감소 시점과 ±1프레임 이내.
+- [ ] 50마리 경보 상황 캡처에서 플레이어와 코어 위치를 2초 안에 찾는다.
+- [ ] 코어 Idle / Hit / LowHP / Destroyed가 코드 틴트 없이도 구분된다.
+- [ ] y-정렬: 캐릭터가 좌석·기둥 앞뒤를 지날 때 겹침 순서가 맞다(피벗이 발/바닥).
+- [ ] 외부: 버스 앞(오른쪽)이 바로 읽힌다. 바퀴 4프레임이 body와 정확히 겹친다.
+- [ ] 지붕 무기: 8방향 조준을 리뷰어가 맞힌다. 포구 섬광과 탄환 생성 위치가 포구 표에서 아트 1 px 이내(Dev 연동 후).
+- [ ] 지붕 무기가 버스 실루엣을 과하게 가리지 않는다(지붕 폭의 1/3 이하).
 
 ---
 
-## 6. 의존성과 담당 (Art가 하지 않는 일)
+## 9. 의존성과 담당 (Art가 하지 않는 일)
 
 | 필요 작업 | 담당 | 내용 |
 |---|---|---|
-| 픽셀 배율 | Development + 디렉터 승인 | 안 B(ortho 5.625, PPU 24) 또는 안 A 결정, 신규 스프라이트를 스케일 1로 배치 |
-| 프레임 재생 | Development | 시트 슬라이스를 애니메이션으로 재생(스케일 모션은 보조로 유지 가능) |
-| 내부 적 스프라이트 버그 | Development | 실제 침입 경로 `TransferEnemyInside`(`LastStopPrototype.cs:767`) → `SeparateInteriorEnemyVisual`(`:807`)이 외부 탑다운 스프라이트를 그대로 복사함. 여기서 측면 내부 스프라이트로 교체해야 함. `SpawnInteriorEnemy`(`:1125`)는 호출처가 없으므로 고쳐도 효과 없음 |
-| 포구 위치 | Development | 방향별 포구 오프셋 표를 데이터로 사용, `(0.4, 0.7)` 고정값 대체 |
-| 로드 경로 | Development | `Assets/Art/...` 납품물을 Resources로 옮길지, 참조 방식으로 바꿀지 |
-| 공격 타이밍 | Development / Planning | 적 hit 프레임과 0.8초 데미지 타이밍 동기화. 밸런스 변경 없음 |
-| 실제 이미지 생성과 픽셀 수정 | 이미지 생성 도구 + 사람 아티스트 | 이 문서의 프롬프트와 후처리 사용 |
+| 해상도·픽셀 배율 | Development + 디렉터 승인 | 3절 권장안(960x540 가상, PPU 48, ortho 5.625, Pixel Perfect Camera) 결정, 신규 스프라이트 스케일 1 배치 |
+| 탑다운 내부 사양 | Planning + 디렉터 | 레이아웃, 조작(공격 방향 수), 적 경로, 카메라. A1 콤보·방향, A2 Breach, A4 전체가 이것에 의존 |
+| 프레임 재생 | Development | 시트를 애니메이션으로 재생, 방향 선택과 flipX |
+| 내부 적 스프라이트 교체 | Development | `SeparateInteriorEnemyVisual`(`LastStopPrototype.cs:807`)의 외부 스프라이트 복사를 A2 애니메이션으로 교체. `SpawnInteriorEnemy`(`:1125`)는 호출처가 없어 고쳐도 효과 없음 |
+| 외부 버스 | Development | `CreateBlock` 강제 크기(`:344`) 대신 스케일 1, 지붕 무기 장착점 데이터 사용 |
+| 포구 위치 | Development | A6 포구 표를 데이터로 사용, `(0.4, 0.7)` 고정값(`:1010`) 대체 |
+| y-정렬과 조명 | Development | Custom Axis 정렬, 코어 시안광·앰버광을 2D Light 또는 가산 스프라이트로 |
+| 로드 경로 | Development | `Assets/Art/...` 납품물을 Resources로 옮길지 참조로 바꿀지 |
+| 공격 타이밍 | Development / Planning | 적 hit 프레임과 0.8초 데미지 동기화. 밸런스 변경 없음 |
+| 실제 이미지 생성과 픽셀 수정 | 이미지 생성 도구 + 사람 아티스트 | 6절 프롬프트와 7절 후처리 |
 
-## 7. 이번 스프린트에서 제외 (참고)
+## 10. 이번 스프린트에서 제외 (참고)
 
-- 배경 2장을 480x270(또는 960x540 정수 배율) 원본으로 다시 만들기: 축소 계단 현상 해결용이며 다음 우선순위이다.
-- `LastStop_BusBody_v2` / `LastStop_BusWheels_v2`: 코드는 준비되어 있고 파일이 없다.
-- VFX 시트 재제작(프레임 분리, 색번짐 제거, 원뿔형 포구 섬광은 A3에 포함).
-- 폐기 후보(삭제는 디렉터 승인 후): `Bus_Interior_Door_Seal`, `Vfx_Seal_Complete`, 미사용 `Player_Exterior_TopDown`.
+- 외부 탑다운 도로 타일셋(아스팔트, 차선, 비 웅덩이, 가로등, 나무): 다음 우선순위. 6.1 스타일 블록 그대로 사용.
+- VFX 시트 재제작(프레임 분리, 색번짐 제거, 피격·사망 탑다운화, BatArc). 포구 섬광은 A6에 포함.
+- HUD 초상화·아이콘(목업의 HP 초상화, 타이머 아이콘): UI 팀 위임 시.
+- 폐기 후보(삭제는 디렉터 승인 후, 지금은 아무것도 지우지 않음): `Player_Interior_SideView`, `Enemy_Interior_SideView`, `LastStop_GuardSwing_v6.png`, `LastStop_NightBusInterior_v1.png`, `LastStop_NightRoad_v1.png`, `Bus_Interior_Door_Seal`, `Vfx_Seal_Complete`. 측면 3/4 `Bus_Exterior_Yellow`는 A5 납품 후 폐기 후보.
 
-## 8. 디렉터 확인 질문
+## 11. 디렉터 확인 질문
 
-1. **외부 시점**: GameDesign.md는 외부를 탑다운으로 정의하지만 현재 빌드의 배경과 버스는 측면/3/4 시점이다. 루프 무기는 현재 화면에 맞춘 3/4 탑다운 기준으로 썼다. 어느 시점이 정본인가?
-2. **캐릭터 크기 확대**(플레이어 화면 약 44 → 96 px, 적 29 → 60 px)는 내부 전투 공간과 충돌 판정에 영향을 줄 수 있다. 판정 크기는 그대로 두고 그림만 키울지, 함께 조정할지 결정이 필요하다(메커닉 변경은 제안만 한다).
-3. **플레이어 재킷 색**을 기둥 노랑과 구분하려고 주황에서 붉은 주황(`#E07A26`)으로 조금 옮기는 것을 승인하는가?
-4. 루프 무기 디자인은 "콩알포" 한 종류만 사양화했다. 비눗방울 발사기와 화염 꼬치도 지붕 포탑 스프라이트가 필요한가, 같은 장착점을 공유하는가?
+1. **방향 수:** 플레이어·적은 **4방향(3장 그림 + flipX)**을 권장한다(프레임 약 45개 vs 8방향 약 75개). 지붕 무기는 **8방향(5장 그림)**을 권장한다. 승인하는가, 플레이어만 8방향으로 할 것인가? 지붕 무기를 16방향으로 늘릴 것인가?
+2. **캐릭터 정체성:** 목업은 남성 생존자, 좀비, 남색 버스를 보여주지만 현재 에셋은 여성 경비원, 스컹크형 짐승, 노란 버스이다. 이 문서는 **기존 디자인을 목업 스타일로 다시 그리는 것**을 기본으로 했다. 목업 디자인으로 바꿀 것인가(대안 프롬프트 6.4 포함)?
+3. **외부 픽셀 밀도:** 외부도 내부와 같은 밀도(PPU 48)를 쓰고 외부 적은 작은 변형(키 약 40 px, A2-E)으로 할지, 외부 카메라를 줌아웃해 밀도가 달라지는 것을 허용할지?
+4. **내부 앞뒤 방향:** 목업은 운전석이 왼쪽(앞이 왼쪽)이지만 외부 버스는 오른쪽으로 달린다. 내부도 앞을 오른쪽으로 뒤집을 것인가? (Planning 레이아웃과 함께 결정)
+5. **해상도:** 1920x1080 기준(가상 960x540, 2x)을 승인하는가? 1280x720은 비정수 배율 확대를 허용하는가?
+6. **조명:** 코어 시안광과 앰버 국소광을 런타임 2D 조명(또는 가산 스프라이트)으로 처리하고 스프라이트에는 굽지 않는 방식을 승인하는가?
+7. **코어 디자인:** 목업의 시안 캡슐 반응로에 기존 버튼 3개를 남기는 절충안을 승인하는가, 기존 화면 단말기 디자인을 유지할 것인가?
+8. **플레이어 재킷 색:** 노란 기둥 `#FBD631`과 구분하려고 붉은 주황(`#E07A26`)으로 옮기는 것을 승인하는가?
+9. **판정 크기:** 캐릭터 그림이 커진다(플레이어 1.67 wu). 충돌·공격 판정은 그대로 두고 그림만 키울지 함께 조정할지(메커닉 변경은 제안만 한다)?
+10. **다른 무기:** 비눗방울 발사기, 화염 꼬치도 지붕 포탑 스프라이트가 필요한가, 같은 장착점을 공유하는가?
+11. **곤봉 콤보:** 탑다운에서도 3타 콤보(A/B/C)를 유지하는가? 유지하지 않으면 AttackB/C 행을 만들지 않는다(Planning 사양 대기).
