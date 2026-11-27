@@ -1,5 +1,8 @@
 # Work queue
 
+## Collaboration (2026-11-27)
+- REVIEW - Claude writes code on claude/* branches, Codex reviews PRs, director merges. See Docs/Collaboration.md.
+
 ## Current integration work (2026-11-11)
 - REVIEW - aligned the design baseline with approved exterior bus weapons, interior-only character combat, one-for-one intrusion, actual-hit shared HP damage, 50-enemy warning, no sealing, eight-minute demo, and planned endless full release.
 - DONE - reset an interior enemy's attack timer when its target changes between core, player, and none; live single-enemy Play Mode logs confirm 0.80-0.81-second hit spacing and 7 HP per hit.
