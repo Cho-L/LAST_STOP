@@ -2,6 +2,7 @@
 
 ## Director decisions follow-up (2026-11-27)
 - REVIEW - Planning: top-down interior spec drafted in Docs/Specs/InteriorTopDown.md; questions 1, 5 and the entry-stagger part of 12 decided on 2026-11-27, the rest open.
+- REVIEW - Planning: interior capacity and bus slowdown spec drafted in Docs/Specs/BusCapacity.md (direction approved 2026-11-27, values open).
 - TODO - Planning: difficulty system proposal (entry stagger Easy 2 s / Hard 1 s / impossible 0 s already set by director); timing needs approval.
 - TODO - Development: rapid-fire card raises fire rate instead of damage.
 - TODO - Development/Sound: stronger hit feedback (simultaneous-hit audio accent, shake, flash, hit-stop).
