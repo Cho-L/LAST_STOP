@@ -1,7 +1,7 @@
 # Work queue
 
 ## Director decisions follow-up (2026-11-27)
-- TODO - Planning: top-down interior spec (layout, controls, enemy path to core, camera) for director review.
+- REVIEW - Planning: top-down interior spec drafted in Docs/Specs/InteriorTopDown.md; 12 director questions open.
 - TODO - Development: rapid-fire card raises fire rate instead of damage.
 - TODO - Development/Sound: stronger hit feedback (simultaneous-hit audio accent, shake, flash, hit-stop).
 - DONE - Art: director chose high-resolution pixel art from two AI mockups (Docs/Media/StyleReference).
