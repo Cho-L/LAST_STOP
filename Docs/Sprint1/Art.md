@@ -134,7 +134,7 @@
 3. **한 번에 한 애니메이션 × 한 방향(1행)만 생성.** 전체 시트를 한 번에 요청하지 않는다.
 4. 같은 대화 스레드 안에서 이어서 생성하고, 앞서 승인된 행을 다시 첨부해 "same character, same proportions, same palette"를 지시한다.
 5. 팔레트 hex를 프롬프트에 적고, 후처리에서 **마스터 팔레트로 강제 매핑**한다(생성 색은 믿지 않는다).
-6. 배경은 단색 크로마. 마젠타 `#FF00FF` 기본, 분홍·자주가 들어간 대상(기본 적)은 초록 `#00FF00`.
+6. 배경은 단색 크로마. 마젠타 `#FF00FF` 기본(기본 적 포함), 마젠타 계열 색이 들어간 대상만 초록 `#00FF00`.
 7. 거절 기준(재생성): 외곽선 없음, 그라데이션·블룸, 프레임마다 키가 3 px 이상 다름, 방향이 틀림, 배경에 그림자·질감, 텍스트·격자선 포함.
 8. 생성 결과는 밑그림이다. **사람이 Aseprite에서 얼굴, 손, 무기, 발 기준선을 반드시 정리**한 뒤 납품한다.
 
@@ -416,12 +416,12 @@ SHEET RULES: equal-size frame cells in a strict grid, the subject the same size 
 BACKGROUND: perfectly flat solid {#FF00FF magenta} filling the entire image, no texture, no vignette, no shadow on the background.
 ```
 
-(기본 적 Rusher는 `{#FF00FF magenta}` → `#00FF00 pure green`.)
+(모든 에셋 기본 마젠타. 좀비풍 크리처 결정으로 기본 적도 마젠타를 쓴다. 대상 색에 마젠타 계열이 있으면 `#00FF00 pure green`으로 바꾼다.)
 
 ### 6.2 모델 시트 (애니메이션 전에 1회, 대상별)
 
 ```
-Create a character model sheet: the same character standing idle in 3 views side by side in equal cells: facing down toward the camera, facing up away from the camera, facing right. Each cell {128x128} art pixels, character about {80} art pixels tall, feet on the bottom baseline at the same height in every cell.
+Create a character model sheet: the same character standing idle in 5 views side by side in equal cells: facing down toward the camera, facing down-right, facing right, facing up-right, facing up away from the camera. Each cell {128x128} art pixels, character about {80} art pixels tall, feet on the bottom baseline at the same height in every cell.
 CHARACTER: {character description from the asset block below}.
 ```
 
@@ -429,7 +429,7 @@ CHARACTER: {character description from the asset block below}.
 
 ```
 SUBJECT: one horizontal row of {6} equal frames, each cell 128x128 art pixels, character about 80 art pixels tall, feet centered horizontally at the same point near the bottom of each cell with about 24 pixels of empty space below the feet and generous empty space around the body for the club swing.
-CHARACTER: a young female night bus guard, brown hair tied in a messy bun, red-orange puffy winter jacket (#B8581C, #E07A26, #F6B04A) with a cream fur collar, dark navy pants, brown boots, olive green backpack with a rolled bedroll, holding a wooden club studded with nails. Identical design, proportions and colors to the attached model sheet.
+CHARACTER: an anime-style (Japanese subculture game style) young woman who guards the night bus, large expressive eyes and a clean stylized face readable at small size, brown hair tied in a messy bun with loose strands, red-orange puffy winter jacket (#B8581C, #E07A26, #F6B04A) with a cream fur collar, dark navy pants, brown boots, olive green backpack, holding a wooden club studded with nails. Stylish and appealing but practical, not chibi. Identical design, proportions and colors to the attached approved model sheet.
 DIRECTION: facing {down toward the camera}.
 ANIMATION: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4, body bobs by 1 pixel}.
 ```
@@ -441,24 +441,26 @@ ANIMATION: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4, body
 - AttackC: `third finishing strike, 4 frames: frame 1 overhead club slamming down in front at contact, frame 2 crouched impact pose with the club touching the floor, frame 3 follow-through, frame 4 recovering. Biggest silhouette of the set` (`{6}` → `4`)
 - Hurt: `hurt reaction, 2 frames, leaning back away from the facing direction, eyes squeezed shut` (`{6}` → `2`)
 
-`{DIRECTION}` 대체: `down toward the camera` / `up away from the camera, back of the head and backpack visible` / `right, three-quarter side view`.
+`{DIRECTION}` 대체 (8방향 중 5방향을 그림, DL/L/UL은 flipX): `down toward the camera` / `down-right, three-quarter front view` / `right, three-quarter side view` / `up-right, three-quarter back view` / `up away from the camera, back of the head and backpack visible`.
 
-### 6.4 A2 기본 적 Rusher
+플레이어 디자인은 감독 결정(서브컬처풍 여성 캐릭터)에 따라 6.2 모델 시트를 먼저 만들어 승인받는다. 위 의상 설명은 기존 캐릭터에서 가져온 출발점이며 모델 시트 단계에서 바뀔 수 있다.
+
+### 6.4 A2 기본 적 (좀비풍 크리처, 감독 결정 2026-11-27)
 
 ```
-SUBJECT: one horizontal row of {6} equal frames, each cell 96x96 art pixels, creature about 64 art pixels tall at the head and about 70 pixels long including the tail, paws on the same baseline near the bottom of each cell with about 12 pixels below, body at the same position in every cell.
-CHARACTER: a feral skunk-like night critter, dark purple fur (#4B293D, #703950, #834859) with a lighter purple rim on top (#A7678A), huge bushy tail with pale pink stripes (#D99688, #FBC9B3), glowing yellow eyes (#FFD23A), red mouth, small cream claws. Aggressive low stance. Simple bold silhouette that stays readable when fifty copies overlap. Identical design to the attached model sheet.
+SUBJECT: one horizontal row of {6} equal frames, each cell 96x96 art pixels, a two-legged creature about 72 art pixels tall, feet on the same baseline near the bottom of each cell with about 12 pixels below, body at the same position in every cell.
+CHARACTER: a zombie-like night creature that used to be a bus passenger: hunched forward posture, overly long arms reaching ahead, grey-green skin (#5E6B4A, #8A9670), torn shirt (#6A607E, #BEB7D3) stained dark red (#7A1622), glowing pale yellow eyes (#FFD23A), slightly too-wide mouth. Creature-like rather than a realistic human corpse, not gory. Simple bold silhouette and few colors so it stays readable when fifty copies overlap. Identical design to the attached approved model sheet.
 DIRECTION: facing {down toward the camera}.
-ANIMATION: {running cycle, 6 frames, looping, tail bouncing}.
+ANIMATION: {shambling walk cycle, 6 frames, looping, arms swaying, head bobbing}.
 ```
 
 대체 문구:
-- Attack: `attack, 4 frames: frame 1 crouching and coiling, frame 2 lunging forward, frame 3 biting and clawing at full extension (hit frame), frame 4 landing back` (`{6}` → `4`)
+- Attack: `attack, 4 frames: frame 1 pulling both arms back, frame 2 lunging forward, frame 3 clawing at full extension (hit frame), frame 4 recovering` (`{6}` → `4`)
 - Hit: `hit reaction, 2 frames, knocked backward, eyes shut` (`{6}` → `2`)
-- Death (D만): `death, 6 frames: flinch, collapse, body dissolving into dark purple smoke, smoke spreading, smoke thinning, only two or three small smoke specks left`
+- Death (D만): `death, 6 frames: flinch, knees buckle, collapse, body dissolving into dark purple smoke, smoke thinning, only two or three small smoke specks left`
 - Breach (D만) [잠정]: `entering through a doorway, 3 frames: leaping in mid-air, landing crouched, standing ready` (`{6}` → `3`)
 
-대안(좀비 디자인 채택 시) CHARACTER 줄: `a shambling zombie bus passenger, grey-green skin (#5E6B4A, #8A9670), torn shirt (#6A607E, #BEB7D3) stained with red, hunched posture, arms reaching forward, pale yellow eyes. About 72 art pixels tall.` + 배경 마젠타.
+`{DIRECTION}` 대체는 6.3과 같은 5방향(DL/L/UL은 flipX). Death와 Breach는 `down toward the camera`만. 배경은 6.1 기본 마젠타 그대로.
 
 ### 6.5 A3 코어
 
@@ -632,7 +634,7 @@ def validate_sheet(path, size, max_colors):
 ## 11. 디렉터 확인 질문
 
 1. **방향 수 — 결정됨 (2026-11-27): 플레이어와 적 모두 8방향.** 지붕 무기 16방향 확장 여부만 남음. 원래 질문: 플레이어·적은 **4방향(3장 그림 + flipX)**을 권장한다(프레임 약 45개 vs 8방향 약 75개). 지붕 무기는 **8방향(5장 그림)**을 권장한다. 승인하는가, 플레이어만 8방향으로 할 것인가? 지붕 무기를 16방향으로 늘릴 것인가?
-2. **캐릭터 정체성 — 부분 결정 (2026-11-27):** 플레이어는 서브컬처풍 여성 캐릭터, 버스는 당분간 노란 버스(커스터마이징은 이후). 적은 좀비 느낌의 크리처(스컹크형 짐승 대체). 원래 질문: 목업은 남성 생존자, 좀비, 남색 버스를 보여주지만 현재 에셋은 여성 경비원, 스컹크형 짐승, 노란 버스이다. 이 문서는 **기존 디자인을 목업 스타일로 다시 그리는 것**을 기본으로 했다. 목업 디자인으로 바꿀 것인가(대안 프롬프트 6.4 포함)?
+2. **캐릭터 정체성 — 결정됨 (2026-11-27):** 플레이어는 서브컬처풍 여성 캐릭터, 버스는 당분간 노란 버스(커스터마이징은 이후). 적은 좀비 느낌의 크리처(스컹크형 짐승 대체). 원래 질문: 목업은 남성 생존자, 좀비, 남색 버스를 보여주지만 현재 에셋은 여성 경비원, 스컹크형 짐승, 노란 버스이다. 이 문서는 **기존 디자인을 목업 스타일로 다시 그리는 것**을 기본으로 했다. 목업 디자인으로 바꿀 것인가(대안 프롬프트 6.4 포함)?
 3. **외부 픽셀 밀도:** 외부도 내부와 같은 밀도(PPU 48)를 쓰고 외부 적은 작은 변형(키 약 40 px, A2-E)으로 할지, 외부 카메라를 줌아웃해 밀도가 달라지는 것을 허용할지?
 4. **내부 앞뒤 방향:** 목업은 운전석이 왼쪽(앞이 왼쪽)이지만 외부 버스는 오른쪽으로 달린다. 내부도 앞을 오른쪽으로 뒤집을 것인가? (Planning 레이아웃과 함께 결정)
 5. **해상도:** 1920x1080 기준(가상 960x540, 2x)을 승인하는가? 1280x720은 비정수 배율 확대를 허용하는가?
