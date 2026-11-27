@@ -1,5 +1,13 @@
 # Work queue
 
+## Director decisions follow-up (2026-11-27)
+- TODO - Planning: top-down interior spec (layout, controls, enemy path to core, camera) for director review.
+- TODO - Development: rapid-fire card raises fire rate instead of damage.
+- TODO - Development/Sound: stronger hit feedback (simultaneous-hit audio accent, shake, flash, hit-stop).
+- DONE - Art: director chose high-resolution pixel art from two AI mockups (Docs/Media/StyleReference).
+- TODO - Art: rewrite Docs/Sprint1/Art.md for top-down view and high-resolution pixel art.
+- BLOCKED - NUnit test suite: waits for the director's PC to be connected for Unity batchmode.
+
 ## Collaboration (2026-11-27)
 - REVIEW - Claude writes code on claude/* branches, Codex reviews PRs, director merges. See Docs/Collaboration.md.
 
