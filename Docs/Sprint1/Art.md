@@ -130,11 +130,11 @@
 ### 2.6 AI 생성물 일관성 유지 방법
 
 1. **공통 스타일 블록(5.1절)을 모든 프롬프트 앞에 그대로 붙인다.** 단어를 바꾸지 않는다.
-2. **참조 이미지 2장을 항상 첨부:** (a) 승인 목업 A(스타일), (b) 해당 캐릭터의 승인된 모델 시트(디자인). 모델 시트가 없으면 먼저 모델 시트(정지 포즈 3방향)를 생성·승인한 뒤 애니메이션 행을 만든다.
+2. **참조 이미지 2장을 항상 첨부:** (a) 승인 목업 A(스타일), (b) 해당 캐릭터의 승인된 모델 시트(디자인). 모델 시트가 없으면 먼저 모델 시트(정지 포즈 5방향: D, DR, R, UR, U)를 생성·승인한 뒤 애니메이션 행을 만든다.
 3. **한 번에 한 애니메이션 × 한 방향(1행)만 생성.** 전체 시트를 한 번에 요청하지 않는다.
 4. 같은 대화 스레드 안에서 이어서 생성하고, 앞서 승인된 행을 다시 첨부해 "same character, same proportions, same palette"를 지시한다.
 5. 팔레트 hex를 프롬프트에 적고, 후처리에서 **마스터 팔레트로 강제 매핑**한다(생성 색은 믿지 않는다).
-6. 배경은 단색 크로마. 마젠타 `#FF00FF` 기본, 분홍·자주가 들어간 대상(기본 적)은 초록 `#00FF00`.
+6. 배경은 단색 크로마. 마젠타 `#FF00FF` 기본(기본 적 포함), 마젠타 계열 색이 들어간 대상만 초록 `#00FF00`.
 7. 거절 기준(재생성): 외곽선 없음, 그라데이션·블룸, 프레임마다 키가 3 px 이상 다름, 방향이 틀림, 배경에 그림자·질감, 텍스트·격자선 포함.
 8. 생성 결과는 밑그림이다. **사람이 Aseprite에서 얼굴, 손, 무기, 발 기준선을 반드시 정리**한 뒤 납품한다.
 
@@ -226,24 +226,24 @@
 | 셀 | **128x128 px** |
 | 캐릭터 크기 | 머리부터 발까지 **80 px**, 어깨 폭 약 32 px. 위·아래·옆으로 곤봉 휘두를 여백 포함 |
 | 피벗 | 발 중앙 **(64, 24) → (0.5, 0.1875)**. 아래(D) 스윙이 발 아래 24 px까지 내려갈 공간 |
-| 방향 | 4방향 권장(D, U, R 그림 + L은 flipX). 8방향 선택 시 DR, UR 행 추가 |
-| 시트 배치 | 6열. 행 = 애니 x 방향(아래 표 순서, 방향 D→U→R) |
-| 시트 크기 | 4방향: 6열 x 18행 = **768x2304**. 8방향: 6열 x 30행 = 768x3840 |
+| 방향 | **8방향 (감독 결정 2026-11-27)**: D, DR, R, UR, U 5방향을 그리고 DL, L, UL은 flipX |
+| 시트 배치 | 6열. 행 = 애니 x 방향(아래 표 순서, 방향 D→DR→R→UR→U) |
+| 시트 크기 | 8방향: 6열 x 30행 = **768x3840** (참고: 4방향이었다면 768x2304) |
 | 슬라이스 접두어 | `Player` |
 | 색 상한 | 32색 + 외곽선 |
 
 | 행 묶음 | 애니 | 프레임 | 속도 | 비고 |
 |---|---|---|---|---|
-| 0–2 | Idle (D/U/R) | 4 | 6 fps | 호흡 1 px, 곤봉 어깨에 걸침 |
-| 3–5 | Walk (D/U/R) | 6 | 10 fps | 루프, 접지 프레임 0과 3. 이동 5 wu/s 기준 보폭은 Dev와 맞춘다 |
-| 6–8 | AttackA 1타 (D/U/R) | 3 | 약 19 fps (0.16초) | **0 = contact**(판정이 입력 즉시라 예비동작 없음), 1 = follow-through, 2 = recover. 바라보는 방향 앞쪽으로 수평 휘두르기 |
-| 9–11 | AttackB 2타 | 3 | 약 19 fps | 반대 방향 되휘두르기 — P2 |
-| 12–14 | AttackC 3타 마무리 | 4 | 약 20 fps | 내려찍기, 가장 큰 실루엣 — P2 |
-| 15–17 | Hurt (D/U/R) | 2 | 12 fps | 뒤로 젖힘. 흰 플래시는 코드가 처리 |
+| 0–4 | Idle (D/DR/R/UR/U) | 4 | 6 fps | 호흡 1 px, 곤봉 어깨에 걸침 |
+| 5–9 | Walk (D/DR/R/UR/U) | 6 | 10 fps | 루프, 접지 프레임 0과 3. 이동 5 wu/s 기준 보폭은 Dev와 맞춘다 |
+| 10–14 | AttackA 1타 (D/DR/R/UR/U) | 3 | 약 19 fps (0.16초) | **0 = contact**(판정이 입력 즉시라 예비동작 없음), 1 = follow-through, 2 = recover. 바라보는 방향 앞쪽으로 수평 휘두르기 |
+| 15–19 | AttackB 2타 (5방향) | 3 | 약 19 fps | 반대 방향 되휘두르기 — P2 |
+| 20–24 | AttackC 3타 마무리 (5방향) | 4 | 약 20 fps | 내려찍기, 가장 큰 실루엣 — P2 |
+| 25–29 | Hurt (D/DR/R/UR/U) | 2 | 12 fps | 뒤로 젖힘. 흰 플래시는 코드가 처리 |
 
-- **최소 납품(MVP):** Idle, Walk, AttackA, Hurt 각 3방향 = 45프레임. 콤보 B/C는 탑다운 조작 사양(Planning)이 3타 콤보를 유지할 때 만든다.
+- **최소 납품(MVP):** Idle, Walk, AttackA, Hurt 각 5방향(DL, L, UL은 flipX) = 75프레임. 시트는 MVP 단계에서도 30행 배치(768x3840)를 유지하고 B/C 행은 비워 둔다. 콤보 B/C는 탑다운 조작 사양(Planning)이 3타 콤보를 유지할 때 만든다.
 - 스윙 궤적(smear)은 시트에 넣지 않는다. 별도 VFX `LastStop_Vfx_TopDown_BatArc_v1.png`(128x128 x 3프레임, 오른쪽 기준, 코드 회전 허용 — 2.5절 예외)로 만든다. 곤봉 끝 2–3 px 단색 잔상까지만 시트에 허용.
-- 디자인: 기존 `Player_Exterior_TopDown`/`Player_Interior_SideView`의 경비원(갈색 올림머리, 붉은 주황 패딩, 크림색 털 깃, 남색 바지, 갈색 부츠, 올리브 배낭, 못 박힌 나무 곤봉)을 목업 스타일로 다시 그린다. 목업의 남성 생존자 디자인으로 바꿀지는 디렉터 질문 2.
+- 디자인: 기존 `Player_Exterior_TopDown`/`Player_Interior_SideView`의 경비원(갈색 올림머리, 붉은 주황 패딩, 크림색 털 깃, 남색 바지, 갈색 부츠, 올리브 배낭, 못 박힌 나무 곤봉)을 바탕으로 한다. **감독 결정(2026-11-27): 서브컬처(애니메이션풍) 여성 캐릭터.** 얼굴·헤어·비율을 애니메이션풍으로 다듬은 새 모델 시트를 먼저 만들어 감독 승인을 받는다. 목업의 남성 생존자 디자인은 쓰지 않는다.
 
 ### A2. 기본 적 — 내부 (탑다운)
 
@@ -251,25 +251,26 @@
 |---|---|
 | 파일 | `Assets/Art/Characters/Enemies/LastStop_Rusher_TopDown_Sheet_v1.png` |
 | 셀 | **96x96 px** |
-| 크기 | 키 약 **64 px**(사족 짐승은 머리 높이 기준), 몸길이(꼬리 포함) 약 70 px. 플레이어보다 확실히 작게 |
+| 크기 | 키 약 **72 px**, 2족 보행 좀비풍 크리처(감독 결정). 플레이어(80 px)보다 작게 |
 | 피벗 | 발 중앙 **(48, 12) → (0.5, 0.125)** |
-| 방향 | 4방향(D, U, R + L flipX). Death와 Breach는 D 1방향 |
-| 시트 배치 | 6열 x 11행 = **576x1056** |
+| 방향 | **8방향 (감독 결정 2026-11-27)**: D, DR, R, UR, U를 그리고 DL, L, UL은 flipX. Death와 Breach는 D 1방향 |
+| 시트 배치 | 6열 x 17행 = **576x1632** (방향 순서 D→DR→R→UR→U) |
 | 슬라이스 접두어 | `Rusher` |
-| 크로마 | **초록 `#00FF00`** (분홍 줄무늬 보호) |
+| 크로마 | **마젠타 `#FF00FF`** (좀비풍 크리처 결정에 따라 변경. 몸에 마젠타 계열 색을 쓰지 않는다) |
 | 색 상한 | 20색 + 외곽선 |
 
 | 행 | 애니 | 프레임 | 속도 | 비고 |
 |---|---|---|---|---|
-| 0–2 | Walk (D/U/R) | 6 | 12 fps | 루프, 꼬리 흔들림 |
-| 3–5 | Attack (D/U/R) | 4 | 12 fps (0.33초) | 0 = 웅크림, 1 = 덤벼듦, **2 = hit 프레임**, 3 = 복귀. 0.8초 주기 안. hit 프레임과 데미지 동기화는 Development 요청 |
-| 6–8 | Hit (D/U/R) | 2 | 12 fps | 넉백 자세. 흰 플래시는 코드 |
-| 9 | Death (D) | 6 | 12 fps | 쓰러짐 → 보라 연기 → 마지막 프레임은 연기 2–3점. 모든 방향 공용 |
-| 10 | Breach (D) [잠정] | 3 | 10 fps | 문에서 뛰어들어 착지. 문 위치가 정해지면 방향 추가 가능. `TriggerEntry`와 연결 |
+| 0–4 | Walk (D/DR/R/UR/U) | 6 | 12 fps | 루프, 구부정한 걸음 |
+| 5–9 | Attack (D/DR/R/UR/U) | 4 | 12 fps (0.33초) | 0 = 웅크림, 1 = 덤벼듦, **2 = hit 프레임**, 3 = 복귀. 0.8초 주기 안. hit 프레임과 데미지 동기화는 Development 요청 |
+| 10–14 | Hit (D/DR/R/UR/U) | 2 | 12 fps | 넉백 자세. 흰 플래시는 코드 |
+| 15 | Death (D) | 6 | 12 fps | 쓰러짐 → 보라 연기 → 마지막 프레임은 연기 2–3점. 모든 방향 공용 |
+| 16 | Breach (D) [잠정] | 3 | 10 fps | 문에서 뛰어들어 착지. 문 위치가 정해지면 방향 추가 가능. `TriggerEntry`와 연결 |
 
-- 50마리가 겹치는 경보 상황을 위해 실루엣을 단순하게: 큰 꼬리, 노란 눈, 분홍 줄무늬. 위쪽 림 `#A7678A`.
+- ~~기존 스컹크형 짐승 디자인~~ (감독 결정으로 대체됨, 아래 참고)
+- 50마리가 겹치는 경보 상황을 위해 실루엣을 단순하게 유지한다.
 - 코드 연동: `SeparateInteriorEnemyVisual`(`LastStopPrototype.cs:807`)에서 외부 스프라이트 복사 대신 이 시트의 애니메이션을 써야 한다(Development).
-- 목업의 좀비 디자인으로 바꿀지는 디렉터 질문 2. 바꾸면 크기를 키 72 px, 2족 보행으로 하고 크로마는 마젠타로 돌린다.
+- **감독 결정(2026-11-27): 좀비 느낌의 크리처.** 스컹크형 짐승 대신 좀비풍 크리처로 바꾼다. 키 72 px, 2족 보행, 크로마 마젠타. 사람 좀비 그대로가 아니라 '크리처' 느낌(과장된 팔, 구부정한 실루엣, 빛나는 눈 등)을 살리고, 군중 속 가독성을 위해 실루엣과 색을 단순하게 한다. 새 모델 시트를 먼저 만들어 감독 승인을 받는다.
 
 ### A3. 코어 (탑다운 3/4 정면)
 
@@ -344,7 +345,7 @@
 - 바퀴: 2개(앞, 뒤)만 옆면 띠 아래로 보인다. 4프레임 회전(휠 캡 무늬 45°씩).
 - 코드 연동(Development): `CreateBlock`이 버스를 4.8x1.8 wu로 강제하므로(`:344`) 스케일 1 배치로 바꿔야 한다. 피격 빨강 틴트는 코드 그대로.
 - 전조등 빛(선택): `LastStop_Bus_TopDown_Headlight_v1.png` 192x96 1장, 외곽선 없음, 앰버 3색.
-- 목업의 남색 선체를 외부에도 쓸지는 디렉터 질문 2.
+- **감독 결정(2026-11-27): 당분간 기존 노란 버스 유지.** 버스 외형 커스터마이징은 이후 기능으로 계획되어 있으므로, 차체·바퀴·지붕 장착물을 분리된 레이어로 그려 나중에 색과 부품을 바꿀 수 있게 한다. 목업의 남색 선체는 쓰지 않는다.
 
 ### A6. 지붕 무기 (콩알포, 8방향) + 포구 섬광
 
@@ -385,7 +386,7 @@
 ### A2-E. 외부 적 (작은 변형) — P3, 디렉터 질문 3 결과에 따름
 
 - `Assets/Art/Characters/Enemies/LastStop_Rusher_TopDown_Exterior_Sheet_v1.png`, 셀 **64x64**, 키 약 40 px, 피벗 (32, 8) → (0.5, 0.125).
-- 4방향(D, U, R + flip) Walk 4프레임 + Death(D) 4프레임 = 4열 x 4행 = 256x256. 색 상한 12색. 같은 디자인을 단순화(꼬리와 눈만 강조).
+- 8방향(D, DR, R, UR, U + flip) Walk 4프레임 + Death(D) 4프레임 = 4열 x 6행 = 256x384. 색 상한 12색. 같은 좀비풍 크리처 디자인을 단순화(실루엣과 빛나는 눈만 강조).
 - 외부 적이 버스에 닿아 내부로 들어가면 내부 표시는 A2를 쓴다(1:1 침입 규칙은 그대로, 그림만 다름).
 
 ### SH. 공용 바닥 그림자
@@ -415,12 +416,12 @@ SHEET RULES: equal-size frame cells in a strict grid, the subject the same size 
 BACKGROUND: perfectly flat solid {#FF00FF magenta} filling the entire image, no texture, no vignette, no shadow on the background.
 ```
 
-(기본 적 Rusher는 `{#FF00FF magenta}` → `#00FF00 pure green`.)
+(모든 에셋 기본 마젠타. 좀비풍 크리처 결정으로 기본 적도 마젠타를 쓴다. 대상 색에 마젠타 계열이 있으면 `#00FF00 pure green`으로 바꾼다.)
 
 ### 6.2 모델 시트 (애니메이션 전에 1회, 대상별)
 
 ```
-Create a character model sheet: the same character standing idle in 3 views side by side in equal cells: facing down toward the camera, facing up away from the camera, facing right. Each cell {128x128} art pixels, character about {80} art pixels tall, feet on the bottom baseline at the same height in every cell.
+Create a character model sheet: the same character standing idle in 5 views side by side in equal cells: facing down toward the camera, facing down-right, facing right, facing up-right, facing up away from the camera. Each cell {128x128} art pixels, character about {80} art pixels tall, feet on the bottom baseline at the same height in every cell.
 CHARACTER: {character description from the asset block below}.
 ```
 
@@ -428,7 +429,7 @@ CHARACTER: {character description from the asset block below}.
 
 ```
 SUBJECT: one horizontal row of {6} equal frames, each cell 128x128 art pixels, character about 80 art pixels tall, feet centered horizontally at the same point near the bottom of each cell with about 24 pixels of empty space below the feet and generous empty space around the body for the club swing.
-CHARACTER: a young female night bus guard, brown hair tied in a messy bun, red-orange puffy winter jacket (#B8581C, #E07A26, #F6B04A) with a cream fur collar, dark navy pants, brown boots, olive green backpack with a rolled bedroll, holding a wooden club studded with nails. Identical design, proportions and colors to the attached model sheet.
+CHARACTER: an anime-style (Japanese subculture game style) young woman who guards the night bus, large expressive eyes and a clean stylized face readable at small size, brown hair tied in a messy bun with loose strands, red-orange puffy winter jacket (#B8581C, #E07A26, #F6B04A) with a cream fur collar, dark navy pants, brown boots, olive green backpack, holding a wooden club studded with nails. Stylish and appealing but practical, not chibi. Identical design, proportions and colors to the attached approved model sheet.
 DIRECTION: facing {down toward the camera}.
 ANIMATION: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4, body bobs by 1 pixel}.
 ```
@@ -440,24 +441,26 @@ ANIMATION: {walk cycle, 6 frames, looping, contact poses on frames 1 and 4, body
 - AttackC: `third finishing strike, 4 frames: frame 1 overhead club slamming down in front at contact, frame 2 crouched impact pose with the club touching the floor, frame 3 follow-through, frame 4 recovering. Biggest silhouette of the set` (`{6}` → `4`)
 - Hurt: `hurt reaction, 2 frames, leaning back away from the facing direction, eyes squeezed shut` (`{6}` → `2`)
 
-`{DIRECTION}` 대체: `down toward the camera` / `up away from the camera, back of the head and backpack visible` / `right, three-quarter side view`.
+`{DIRECTION}` 대체 (8방향 중 5방향을 그림, DL/L/UL은 flipX): `down toward the camera` / `down-right, three-quarter front view` / `right, three-quarter side view` / `up-right, three-quarter back view` / `up away from the camera, back of the head and backpack visible`.
 
-### 6.4 A2 기본 적 Rusher
+플레이어 디자인은 감독 결정(서브컬처풍 여성 캐릭터)에 따라 6.2 모델 시트를 먼저 만들어 승인받는다. 위 의상 설명은 기존 캐릭터에서 가져온 출발점이며 모델 시트 단계에서 바뀔 수 있다.
+
+### 6.4 A2 기본 적 (좀비풍 크리처, 감독 결정 2026-11-27)
 
 ```
-SUBJECT: one horizontal row of {6} equal frames, each cell 96x96 art pixels, creature about 64 art pixels tall at the head and about 70 pixels long including the tail, paws on the same baseline near the bottom of each cell with about 12 pixels below, body at the same position in every cell.
-CHARACTER: a feral skunk-like night critter, dark purple fur (#4B293D, #703950, #834859) with a lighter purple rim on top (#A7678A), huge bushy tail with pale pink stripes (#D99688, #FBC9B3), glowing yellow eyes (#FFD23A), red mouth, small cream claws. Aggressive low stance. Simple bold silhouette that stays readable when fifty copies overlap. Identical design to the attached model sheet.
+SUBJECT: one horizontal row of {6} equal frames, each cell 96x96 art pixels, a two-legged creature about 72 art pixels tall, feet on the same baseline near the bottom of each cell with about 12 pixels below, body at the same position in every cell.
+CHARACTER: a zombie-like night creature that used to be a bus passenger: hunched forward posture, overly long arms reaching ahead, grey-green skin (#5E6B4A, #8A9670), torn shirt (#6A607E, #BEB7D3) stained dark red (#7A1622), glowing pale yellow eyes (#FFD23A), slightly too-wide mouth. Creature-like rather than a realistic human corpse, not gory. Simple bold silhouette and few colors so it stays readable when fifty copies overlap. Identical design to the attached approved model sheet.
 DIRECTION: facing {down toward the camera}.
-ANIMATION: {running cycle, 6 frames, looping, tail bouncing}.
+ANIMATION: {shambling walk cycle, 6 frames, looping, arms swaying, head bobbing}.
 ```
 
 대체 문구:
-- Attack: `attack, 4 frames: frame 1 crouching and coiling, frame 2 lunging forward, frame 3 biting and clawing at full extension (hit frame), frame 4 landing back` (`{6}` → `4`)
+- Attack: `attack, 4 frames: frame 1 pulling both arms back, frame 2 lunging forward, frame 3 clawing at full extension (hit frame), frame 4 recovering` (`{6}` → `4`)
 - Hit: `hit reaction, 2 frames, knocked backward, eyes shut` (`{6}` → `2`)
-- Death (D만): `death, 6 frames: flinch, collapse, body dissolving into dark purple smoke, smoke spreading, smoke thinning, only two or three small smoke specks left`
+- Death (D만): `death, 6 frames: flinch, knees buckle, collapse, body dissolving into dark purple smoke, smoke thinning, only two or three small smoke specks left`
 - Breach (D만) [잠정]: `entering through a doorway, 3 frames: leaping in mid-air, landing crouched, standing ready` (`{6}` → `3`)
 
-대안(좀비 디자인 채택 시) CHARACTER 줄: `a shambling zombie bus passenger, grey-green skin (#5E6B4A, #8A9670), torn shirt (#6A607E, #BEB7D3) stained with red, hunched posture, arms reaching forward, pale yellow eyes. About 72 art pixels tall.` + 배경 마젠타.
+`{DIRECTION}` 대체는 6.3과 같은 5방향(DL/L/UL은 flipX). Death와 Breach는 `down toward the camera`만. 배경은 6.1 기본 마젠타 그대로.
 
 ### 6.5 A3 코어
 
@@ -576,7 +579,7 @@ def validate_sheet(path, size, max_colors):
 리뷰 조건: 960x540(1x)과 1920x1080(2x) 실제 플레이 캡처(정지와 실시간 영상). Art는 Unity를 실행하지 않으므로 캡처는 Development/QA가 만들고 통과 여부는 디렉터가 판정한다.
 
 **파일과 임포트**
-- [ ] 시트 크기가 5절과 같다(768x2304, 576x1056, 768x512, 768x96, 384x384, 144x240, 72x24, Bus body 320x144 / wheels 1280x144 등).
+- [ ] 시트 크기가 5절과 같다(768x3840, 576x1632, 768x512, 768x96, 384x384, 144x240, 72x24, Bus body 320x144 / wheels 1280x144 등).
 - [ ] alpha는 0과 255만 있다(`validate_sheet`).
 - [ ] 색 수가 항목별 상한 이하이고 모든 색이 마스터 팔레트(+캐릭터 램프)에 있다.
 - [ ] `.meta`: `filterMode: 0`, **모든 플랫폼** `textureCompression: 0`, `spritePixelsToUnits: 48`(또는 합의값), mipmap off, 자동 잔여 슬라이스 없음.
@@ -630,8 +633,8 @@ def validate_sheet(path, size, max_colors):
 
 ## 11. 디렉터 확인 질문
 
-1. **방향 수:** 플레이어·적은 **4방향(3장 그림 + flipX)**을 권장한다(프레임 약 45개 vs 8방향 약 75개). 지붕 무기는 **8방향(5장 그림)**을 권장한다. 승인하는가, 플레이어만 8방향으로 할 것인가? 지붕 무기를 16방향으로 늘릴 것인가?
-2. **캐릭터 정체성:** 목업은 남성 생존자, 좀비, 남색 버스를 보여주지만 현재 에셋은 여성 경비원, 스컹크형 짐승, 노란 버스이다. 이 문서는 **기존 디자인을 목업 스타일로 다시 그리는 것**을 기본으로 했다. 목업 디자인으로 바꿀 것인가(대안 프롬프트 6.4 포함)?
+1. **방향 수 — 결정됨 (2026-11-27): 플레이어와 적 모두 8방향.** 지붕 무기 16방향 확장 여부만 남음. 원래 질문: 플레이어·적은 **4방향(3장 그림 + flipX)**을 권장한다(프레임 약 45개 vs 8방향 약 75개). 지붕 무기는 **8방향(5장 그림)**을 권장한다. 승인하는가, 플레이어만 8방향으로 할 것인가? 지붕 무기를 16방향으로 늘릴 것인가?
+2. **캐릭터 정체성 — 결정됨 (2026-11-27):** 플레이어는 서브컬처풍 여성 캐릭터, 버스는 당분간 노란 버스(커스터마이징은 이후). 적은 좀비 느낌의 크리처(스컹크형 짐승 대체). 원래 질문: 목업은 남성 생존자, 좀비, 남색 버스를 보여주지만 현재 에셋은 여성 경비원, 스컹크형 짐승, 노란 버스이다. 이 문서는 **기존 디자인을 목업 스타일로 다시 그리는 것**을 기본으로 했다. 목업 디자인으로 바꿀 것인가(대안 프롬프트 6.4 포함)?
 3. **외부 픽셀 밀도:** 외부도 내부와 같은 밀도(PPU 48)를 쓰고 외부 적은 작은 변형(키 약 40 px, A2-E)으로 할지, 외부 카메라를 줌아웃해 밀도가 달라지는 것을 허용할지?
 4. **내부 앞뒤 방향:** 목업은 운전석이 왼쪽(앞이 왼쪽)이지만 외부 버스는 오른쪽으로 달린다. 내부도 앞을 오른쪽으로 뒤집을 것인가? (Planning 레이아웃과 함께 결정)
 5. **해상도:** 1920x1080 기준(가상 960x540, 2x)을 승인하는가? 1280x720은 비정수 배율 확대를 허용하는가?
