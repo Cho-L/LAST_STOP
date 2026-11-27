@@ -1,10 +1,18 @@
 # LAST STOP — MVP design baseline
 Genre: 2D bus survival roguelike, Unity 6, C#.
 EXTERIOR: top-down view; the moving bus fires its weapons automatically at approaching enemies. The character fights only inside the bus. The exterior simulation continues while the interior is shown.
-INTERIOR: side-view manual combat; enemies breach bus while exterior simulation continues.
+INTERIOR: top-down manual combat inside the bus (director decision 2026-11-27; the current build is still side-view until migrated); enemies breach bus while exterior simulation continues.
 Each exterior enemy touching the bus enters the interior one-for-one. Player switches views to fight intruders, then returns outside while both simulations continue. There is no sealing mechanic. Interior enemy count 50 is a warning threshold, not an instant defeat.
 Player and visible interior core share one survival HP pool. An interior enemy moves toward the core; if it encounters the player, it attacks the player, otherwise it attacks the core on arrival. Each actual hit damages the shared HP once; enemy count alone causes no damage. Shared HP <= 0 triggers game over. Exact combat balance remains subject to director review.
 The player starts behind the core and can move forward to intercept approaching intruders. Exterior projectiles stop tracking an enemy once it enters the bus.
 Current submission baseline is an eight-minute survival run ending in arrival at the next stop. HP zero ends the run in defeat, and R restarts after either result. Endless driving, intermediate stops, resources, facilities, route choice, and manual bus steering are planned follow-up systems. Their timing and effects require director approval before implementation. The demo scope is three weapons and two support abilities; the full game targets at least seven weapon techs and combinations that can include five parts. Exact content, progression, and balance remain subject to director review.
 First playable: one exterior arena, one bus interior, one enemy archetype, bus auto attack, manual interior attack, 1:1 intrusion, view switch, shared survival HP, core target and game over, placeholder visuals/audio.
 A playable prototype exists. Its current scene structure, UI, audio, and art require integration review before being marked complete; see Docs/Tasks.md.
+
+## Director decisions (2026-11-27)
+- Level-up pauses the whole game, including the eight-minute arrival clock. A run can therefore take longer than eight minutes of real time.
+- Camera: both exterior and interior use a top-down view in the style of common Vampire Survivors-like games. The interior migrates from side-view to top-down; movement, attack, enemy pathing to the core and interior art must be redesigned. Detailed interior layout and controls require a planning spec and director review before implementation.
+- The rapid-fire upgrade card ("콩알 연발포") increases fire rate, as its name says, instead of adding damage. Exact values remain subject to balance review.
+- Hit feedback (dealing and taking damage) should feel strong: layered or accented audio for simultaneous hits, plus screen feedback such as shake, flash and hit-stop. Intensity values remain subject to director review.
+- Art style (pixel art vs. high-resolution 2D illustration) is undecided; the director wants mid-to-high resolution and will choose after seeing examples.
+
