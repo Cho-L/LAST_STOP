@@ -1,0 +1,14 @@
+PASS menu paused mode=0 t=9.85 level=2
+PASS menu paused mode=0 t=38.29 level=3
+PASS menu paused mode=0 t=78.62 level=4
+PASS menu paused mode=0 t=130.65 level=5
+PASS menu paused mode=0 t=184.56 level=6
+PASS menu paused mode=0 t=240.71 level=7
+PASS menu paused mode=0 t=321.16 level=8
+PASS menu paused mode=0 t=406.14 level=9
+PASS 다음 정류장 도착! t=480.02 hp=100 버스를 지켜냈어요|생존 시간 08:00 · 처치 202|최고 차내 0 · 레벨 9 result text fits
+PASS arrival R restart HP100 Level1 outside, one game
+PASS menu paused mode=1 t=14.00 level=2
+PASS 이번 정류장은 여기까지… t=25.73 hp=0 코어 피격 · 생존력 0 result text fits
+PASS defeat R restart HP100 Level1 outside, one game
+PASS ROUTE COMPLETE
