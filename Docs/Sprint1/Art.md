@@ -28,7 +28,7 @@
 
 | 파일 | 픽셀 크기 | 내용 (슬라이스) | 사용처 | 960x540 문제 |
 |---|---|---|---|---|
-| `LastStop_MvpSpritesheet_v1.png` | 1774x887 | `Player_Exterior_TopDown` 294x313, `Player_Interior_SideView` 322x330, `Enemy_Exterior_TopDown` 162x292, `Enemy_Interior_SideView` 340x235, `Bus_Exterior_Yellow` 1230x511, `Bus_Interior_Door_Seal` 342x466 | 내부 플레이어(0.70x0.90 wu), 외부 적(0.60x0.60 wu), **내부 적도 `Rusher.ExteriorSprite`(탑다운) 사용**, 외부 버스(4.8x1.8 wu) | 내부 플레이어 약 **34x44 화면 px**, 가로 약 21% 눌림. 적 약 **29x29 px**, 162x292 원본을 정사각형에 넣어 가로 약 1.8배 늘어남. 내부에 탑다운 적이 나와 시점이 맞지 않음(`Enemy_Interior_SideView` 미사용). 버스 236x88 px, 약 11% 비균등. `Player_Exterior_TopDown`은 캐릭터가 외부에 나오지 않으므로 미사용. `Bus_Interior_Door_Seal`은 **봉인 메커닉이 없으므로** 폐기 대상. 원본이 약 10–25배 축소되어 디테일이 뭉개지고 픽셀 그리드가 없다. |
+| `LastStop_MvpSpritesheet_v1.png` | 1774x887 | `Player_Exterior_TopDown` 294x313, `Player_Interior_SideView` 322x330, `Enemy_Exterior_TopDown` 162x292, `Enemy_Interior_SideView` 340x235, `Bus_Exterior_Yellow` 1230x511, `Bus_Interior_Door_Seal` 342x466 | 내부 플레이어(0.70x0.90 wu), 외부 적(0.60x0.60 wu), **내부 적도 외부 탑다운 스프라이트 사용** (`SeparateInteriorEnemyVisual`, `LastStopPrototype.cs:807`에서 복사), 외부 버스(4.8x1.8 wu) | 내부 플레이어 약 **34x44 화면 px**, 가로 약 21% 눌림. 적 약 **29x29 px**, 162x292 원본을 정사각형에 넣어 가로 약 1.8배 늘어남. 내부에 탑다운 적이 나와 시점이 맞지 않음(`Enemy_Interior_SideView` 미사용). 버스 236x88 px, 약 11% 비균등. `Player_Exterior_TopDown`은 캐릭터가 외부에 나오지 않으므로 미사용. `Bus_Interior_Door_Seal`은 **봉인 메커닉이 없으므로** 폐기 대상. 원본이 약 10–25배 축소되어 디테일이 뭉개지고 픽셀 그리드가 없다. |
 | `LastStop_GuardSwing_v6.png` | 896x330 | 448x330 2프레임 (contact / follow-through). 메타 자동 슬라이스에 7x6 같은 잔여 조각 15개 | `ConfigureInteriorSwing`이 직접 `Sprite.Create`로 자름 (가로 448 고정, idle 너비 322 검사) | 2프레임뿐이라 걷기/콤보 구분이 없다. 노란 스윙 궤적이 그림에 포함되어 있어 좌우 반전·콤보별 변화가 어렵다. 코드가 크기에 하드코딩되어 있어 교체 시 코드도 바꿔야 한다. |
 | `LastStop_InteriorCore_v1.png` | 1254x1254 | 코어 본체 1185x1207 + 잔여 조각 19개 | 내부 코어 (0.96x1.05 wu) | 화면 약 **47x52 px**, 25배 축소로 화면 그래프·버튼이 읽히지 않는다. 저HP·피격 상태는 색 틴트로만 표현된다. |
 | `LastStop_CombatVfx_v1.png` | 1774x887 | `Vfx_Bean_Projectile`, `Vfx_Bubble_Projectile`, `Vfx_Flame_Loop`, `Vfx_Hit`, `Vfx_Enemy_Death`, `Vfx_Seal_Complete`. 코드가 (310,632,150,175) 영역을 `Vfx_Bus_Muzzle`로 별도 생성 | 탄환, 화염, 피격, 사망, 버스 궤적, 포구 섬광 | 각 효과가 다프레임 스트립인데 슬라이스는 1개씩이라 애니메이션 없이 첫 묶음이 통째로 표시된다. 빨강·초록 색번짐(halo)이 보인다. `Vfx_Seal_Complete`(자물쇠)는 봉인 메커닉이 없으므로 폐기 대상. 포구 섬광이 반짝이 별 모양이라 포구 위치를 알려주지 못한다. |
@@ -346,7 +346,7 @@ def clean_frame(src, box, cell, palette_png, chroma=(255, 0, 255), tol=80):
 |---|---|---|
 | 픽셀 배율 | Development + 디렉터 승인 | 안 B(ortho 5.625, PPU 24) 또는 안 A 결정, 신규 스프라이트를 스케일 1로 배치 |
 | 프레임 재생 | Development | 시트 슬라이스를 애니메이션으로 재생(스케일 모션은 보조로 유지 가능) |
-| 내부 적 스프라이트 버그 | Development | `SpawnInteriorEnemy`가 `Rusher.ExteriorSprite`를 사용 → `InteriorSprite`로 |
+| 내부 적 스프라이트 버그 | Development | 실제 침입 경로 `TransferEnemyInside`(`LastStopPrototype.cs:767`) → `SeparateInteriorEnemyVisual`(`:807`)이 외부 탑다운 스프라이트를 그대로 복사함. 여기서 측면 내부 스프라이트로 교체해야 함. `SpawnInteriorEnemy`(`:1125`)는 호출처가 없으므로 고쳐도 효과 없음 |
 | 포구 위치 | Development | 방향별 포구 오프셋 표를 데이터로 사용, `(0.4, 0.7)` 고정값 대체 |
 | 로드 경로 | Development | `Assets/Art/...` 납품물을 Resources로 옮길지, 참조 방식으로 바꿀지 |
 | 공격 타이밍 | Development / Planning | 적 hit 프레임과 0.8초 데미지 타이밍 동기화. 밸런스 변경 없음 |
